@@ -4,7 +4,20 @@
 #include "Timer.h"
 
 constexpr std::string_view kOutputDir  = "Outputs";
-constexpr std::string_view kSampleName = "4. Rays, a Simple Camera, and Background";
+constexpr std::string_view kSampleName = "5. Adding a Sphere";
+
+bool HitSphere(
+    const Vec3  _center,
+    const float _radius,
+    const Ray&  _ray)
+{
+    const Vec3  qc        = _ray.origin - _center;
+    const float a         = _ray.dir.Dot(_ray.dir);
+    const float b         = 2.f * qc.Dot(_ray.dir);
+    const float c         = qc.Dot(qc) - _radius * _radius;
+    const float quadratic = b * b - 4.f * a * c;
+    return quadratic > 0.f;
+}
 
 Vec3 RayColor(
     const Ray _ray)
@@ -12,6 +25,11 @@ Vec3 RayColor(
     ASSERT(_ray.dir.IsNormalized(), "Ray direction must be normalized.");
     constexpr Vec3 kWhite { 1.f };
     constexpr Vec3 kSky = { 0.5f, 0.7f, 1.f };
+
+    if (HitSphere({ 0.f, 0.f, 1.f }, 0.5f, _ray))
+    {
+        return { 1.f, 0.f, 0.f };
+    }
 
     float a = 0.5f * (_ray.dir.y + 1.f);
     return kWhite.Lerp(kSky, a);
