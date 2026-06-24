@@ -4,7 +4,20 @@
 #include "Timer.h"
 
 constexpr std::string_view kOutputDir  = "Outputs";
-constexpr std::string_view kSampleName = "4. Rays, a Simple Camera, and Background";
+constexpr std::string_view kSampleName = "5. Adding a Sphere";
+
+bool HitSphere(
+    const Vec3  _center,
+    const float _radius,
+    const Ray&  _ray)
+{
+    const Vec3  qc = _ray.origin - _center;
+    const float a  = _ray.dir.Dot(_ray.dir);
+    const float b  = 2.f * qc.Dot(_ray.dir);
+    const float c  = qc.Dot(qc) - _radius * _radius;
+    const float d  = b * b - 4.f * a * c;
+    return d >= 0.f;
+}
 
 Vec3 RayColor(
     const Ray _ray)
@@ -12,6 +25,11 @@ Vec3 RayColor(
     ASSERT(_ray.dir.IsNormalized(), "Ray direction must be normalized.");
     constexpr Vec3 kWhite { 1.f };
     constexpr Vec3 kSky = { 0.5f, 0.7f, 1.f };
+
+    if (HitSphere({ 0.f, 0.f, 1.f }, 0.5f, _ray))
+    {
+        return { 1.f, 0.f, 0.f };
+    }
 
     float a = 0.5f * (_ray.dir.y + 1.f);
     return kWhite.Lerp(kSky, a);
@@ -34,9 +52,9 @@ int main()
 {
     // 이미지 spec
     constexpr float kDesireAspectRatio = 16.f / 9.f;
-    constexpr float kHeight            = 256.f;
-    constexpr float kWidth             = Floor(kHeight * kDesireAspectRatio);
-    constexpr float kAspectRatio       = static_cast<float>(kWidth) / kHeight;
+    const Int32     kHeight            = 256;
+    const Int32     kWidth             = static_cast<Int32>(kHeight * kDesireAspectRatio);
+    constexpr float kAspectRatio       = static_cast<float>(kWidth) / static_cast<float>(kHeight);
 
     // 뷰포트 spec
     constexpr float kViewportHeight     = 2.f;
@@ -46,22 +64,21 @@ int main()
     constexpr float kFieldOfView        = ToRad(90.f);   // 시야각
 
     // 1픽셀이 뷰포트에서 차지하는 크기
-    constexpr float kPixelW = kViewportWidth / kWidth;
-    constexpr float kPixelH = kViewportHeight / kHeight;
+    constexpr float kPixelW = kViewportWidth / static_cast<float>(kWidth);
+    constexpr float kPixelH = kViewportHeight / static_cast<float>(kHeight);
 
     // 카메라 위치 계산
     const float focalLength = (kViewportHeight / 2.f) / ::tanf(kFieldOfView / 2.f);
     const Vec3  cmrPos      = { 0.f, 0.f, 0.f };
 
-    constexpr Int32 kiWidth  = static_cast<Int32>(kWidth);
-    constexpr Int32 kiHeight = static_cast<Int32>(kHeight);
-    RGBImageBuffer  image    = { kiWidth, kiHeight };
+    RGBImageBuffer image = { kWidth, kHeight };
 
     {
         SCOPED_PROFILE("Rendering Image");
-        for (Int32 y = 0; y < kiHeight; ++y)
+
+        for (Int32 y = 0; y < kHeight; ++y)
         {
-            for (Int32 x = 0; x < kiWidth; ++x)
+            for (Int32 x = 0; x < kWidth; ++x)
             {
                 // 스크린 좌표 -> 뷰포트 좌표
                 const float yy  = kViewportHeightHalf - (static_cast<float>(y) + 0.5f) * kPixelH;
