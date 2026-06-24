@@ -51,7 +51,7 @@ int main()
 
     // 카메라 위치 계산
     const float focalLength = (kViewportHeight / 2.f) / ::tanf(kFieldOfView / 2.f);
-    const Vec3  cmrPos      = { 0.f, 0.f, -focalLength };
+    const Vec3  cmrPos      = { 0.f, 0.f, 0.f };
 
     constexpr Int32 kiWidth  = static_cast<Int32>(kWidth);
     constexpr Int32 kiHeight = static_cast<Int32>(kHeight);
@@ -66,7 +66,7 @@ int main()
                 // 스크린 좌표 -> 뷰포트 좌표
                 const float yy  = kViewportHeightHalf - (static_cast<float>(y) + 0.5f) * kPixelH;
                 const float xx  = (static_cast<float>(x) + 0.5f) * kPixelW - kViewportWidthHalf;
-                const Vec3  dir = (Vec3 { xx, yy, 0.f } - cmrPos);
+                const Vec3  dir = (Vec3 { xx, yy, focalLength } - cmrPos);
                 const Ray   ray = { cmrPos, dir.Normalize() };
                 image.WriteLinear(x, y, RayColor(ray));
             }
