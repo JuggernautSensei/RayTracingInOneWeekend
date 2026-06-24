@@ -2,86 +2,71 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClCompile Include="Main.cpp" />
-    <ClCompile Include="새 폴더\stb\stb_vorbis.c">
-      <Filter>Vendor\stb</Filter>
+    <ClCompile Include="Vector.cpp">
+      <Filter>Math</Filter>
     </ClCompile>
-    <ClCompile Include="Vec3.cpp" />
+    <ClCompile Include="DataType.cpp">
+      <Filter>Base</Filter>
+    </ClCompile>
+    <ClCompile Include="pch.cpp">
+      <Filter>Base</Filter>
+    </ClCompile>
+    <ClCompile Include="Math.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="Ray.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="Assertion.cpp">
+      <Filter>Base</Filter>
+    </ClCompile>
+    <ClCompile Include="Image.cpp" />
+    <ClCompile Include="Timer.cpp">
+      <Filter>Base</Filter>
+    </ClCompile>
+    <ClCompile Include="Profile.cpp">
+      <Filter>Base</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include=".clang-format" />
   </ItemGroup>
   <ItemGroup>
-    <Filter Include="Vendor">
-      <UniqueIdentifier>{021ecf9f-1253-46b4-9c5b-cf4d9054e502}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Vendor\stb">
-      <UniqueIdentifier>{ac52d24a-4d27-4726-8b85-72c809600f03}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Math">
       <UniqueIdentifier>{59790a0a-d206-4094-a45d-8fa66b7f6c78}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Base">
+      <UniqueIdentifier>{eaf0c77f-debd-46f7-b779-4febcee77db0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="새 폴더\stb\stb_c_lexer.h">
-      <Filter>Vendor\stb</Filter>
+    <ClInclude Include="Vector.h">
+      <Filter>Math</Filter>
     </ClInclude>
-    <ClInclude Include="새 폴더\stb\stb_connected_components.h">
-      <Filter>Vendor\stb</Filter>
+    <ClInclude Include="DataType.h">
+      <Filter>Base</Filter>
     </ClInclude>
-    <ClInclude Include="새 폴더\stb\stb_divide.h">
-      <Filter>Vendor\stb</Filter>
+    <ClInclude Include="pch.h">
+      <Filter>Base</Filter>
     </ClInclude>
-    <ClInclude Include="새 폴더\stb\stb_ds.h">
-      <Filter>Vendor\stb</Filter>
+    <ClInclude Include="Math.h">
+      <Filter>Math</Filter>
     </ClInclude>
-    <ClInclude Include="새 폴더\stb\stb_dxt.h">
-      <Filter>Vendor\stb</Filter>
+    <ClInclude Include="Ray.h">
+      <Filter>Math</Filter>
     </ClInclude>
-    <ClInclude Include="새 폴더\stb\stb_easy_font.h">
-      <Filter>Vendor\stb</Filter>
+    <ClInclude Include="Assertion.h">
+      <Filter>Base</Filter>
     </ClInclude>
-    <ClInclude Include="새 폴더\stb\stb_herringbone_wang_tile.h">
-      <Filter>Vendor\stb</Filter>
+    <ClInclude Include="Config.h">
+      <Filter>Base</Filter>
     </ClInclude>
-    <ClInclude Include="새 폴더\stb\stb_hexwave.h">
-      <Filter>Vendor\stb</Filter>
+    <ClInclude Include="Image.h" />
+    <ClInclude Include="Timer.h">
+      <Filter>Base</Filter>
     </ClInclude>
-    <ClInclude Include="새 폴더\stb\stb_image.h">
-      <Filter>Vendor\stb</Filter>
+    <ClInclude Include="Profile.h">
+      <Filter>Base</Filter>
     </ClInclude>
-    <ClInclude Include="새 폴더\stb\stb_image_resize2.h">
-      <Filter>Vendor\stb</Filter>
-    </ClInclude>
-    <ClInclude Include="새 폴더\stb\stb_image_write.h">
-      <Filter>Vendor\stb</Filter>
-    </ClInclude>
-    <ClInclude Include="새 폴더\stb\stb_include.h">
-      <Filter>Vendor\stb</Filter>
-    </ClInclude>
-    <ClInclude Include="새 폴더\stb\stb_leakcheck.h">
-      <Filter>Vendor\stb</Filter>
-    </ClInclude>
-    <ClInclude Include="새 폴더\stb\stb_perlin.h">
-      <Filter>Vendor\stb</Filter>
-    </ClInclude>
-    <ClInclude Include="새 폴더\stb\stb_rect_pack.h">
-      <Filter>Vendor\stb</Filter>
-    </ClInclude>
-    <ClInclude Include="새 폴더\stb\stb_sprintf.h">
-      <Filter>Vendor\stb</Filter>
-    </ClInclude>
-    <ClInclude Include="새 폴더\stb\stb_textedit.h">
-      <Filter>Vendor\stb</Filter>
-    </ClInclude>
-    <ClInclude Include="새 폴더\stb\stb_tilemap_editor.h">
-      <Filter>Vendor\stb</Filter>
-    </ClInclude>
-    <ClInclude Include="새 폴더\stb\stb_truetype.h">
-      <Filter>Vendor\stb</Filter>
-    </ClInclude>
-    <ClInclude Include="새 폴더\stb\stb_voxel_render.h">
-      <Filter>Vendor\stb</Filter>
-    </ClInclude>
-    <ClInclude Include="Vec3.h" />
   </ItemGroup>
 </Project>
