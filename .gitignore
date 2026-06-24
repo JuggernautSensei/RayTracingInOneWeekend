@@ -1,3 +1,6 @@
 .vs/
-.Bin/
-.Inter/
+Bin/
+Inter/
+*.pch
+*.obj
+*.pdb
