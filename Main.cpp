@@ -20,7 +20,7 @@ void SaveImageBuffer(
     const RGBImageBuffer& _image)
 {
     const TimeStamp   ts       = TimeStamp::Current();
-    const std::string filename = std::format("{} ({:04}.{:02}.{:02} {:02}h {:02}m {:02}s).png", kSampleName, ts.year, ts.month, ts.day, ts.hour, ts.min, ts.src);
+    const std::string filename = std::format("{} {:04}-{:02}-{:02} {:02}{:02}{:02}.png", kSampleName, ts.year, ts.month, ts.day, ts.hour, ts.min, ts.src);
 
     fs::path path = kOutputDir;
     path /= filename;
