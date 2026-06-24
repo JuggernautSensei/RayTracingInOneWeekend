@@ -30,7 +30,7 @@ ScopedProfile::ScopedProfile(
     , m_name(_name)
 {
     const std::string spacing(s_spacing * 2, ' ');
-    std::cout << std::format("[Profile] {}> {}", spacing, m_name);
+    std::cout << std::format("[Profile] {}▶ {}\n", spacing, m_name);
 
     ++s_spacing;
     m_timer.Start();
@@ -44,5 +44,5 @@ ScopedProfile::~ScopedProfile()
     const double           elapsed = m_timer.GetTotal(m_prefix);
     const std::string_view unit    = ToTimeUnitString_(m_prefix);
     const std::string      spacing(s_spacing * 2, ' ');
-    std::cout << std::format("[Profile] {}< {}: {:.3f} {}", spacing, m_name, elapsed, unit);
+    std::cout << std::format("[Profile] {}◀ {:.3f} {}\n", spacing, elapsed, unit);
 }

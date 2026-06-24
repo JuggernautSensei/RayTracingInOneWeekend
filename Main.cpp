@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "Image.h"
+#include "Profile.h"
 #include "Timer.h"
 
 constexpr std::string_view kOutputDir  = "Outputs";
@@ -19,6 +20,8 @@ Vec3 RayColor(
 void SaveImageBuffer(
     const RGBImageBuffer& _image)
 {
+    FUNCTION_PROFILE();
+
     const TimeStamp   ts       = TimeStamp::Current();
     const std::string filename = std::format("{} {:04}-{:02}-{:02} {:02}{:02}{:02}.png", kSampleName, ts.year, ts.month, ts.day, ts.hour, ts.min, ts.src);
 
@@ -53,16 +56,20 @@ int main()
     constexpr Int32 kiWidth  = static_cast<Int32>(kWidth);
     constexpr Int32 kiHeight = static_cast<Int32>(kHeight);
     RGBImageBuffer  image    = { kiWidth, kiHeight };
-    for (Int32 y = 0; y < kiHeight; ++y)
+
     {
-        for (Int32 x = 0; x < kiWidth; ++x)
+        SCOPED_PROFILE("Rendering Image");
+        for (Int32 y = 0; y < kiHeight; ++y)
         {
-            // 스크린 좌표 -> 뷰포트 좌표
-            const float yy  = kViewportHeightHalf - (static_cast<float>(y) + 0.5f) * kPixelH;
-            const float xx  = (static_cast<float>(x) + 0.5f) * kPixelW - kViewportWidthHalf;
-            const Vec3  dir = (Vec3 { xx, yy, 0.f } - cmrPos);
-            const Ray   ray = { cmrPos, dir.Normalize() };
-            image.WriteLinear(x, y, RayColor(ray));
+            for (Int32 x = 0; x < kiWidth; ++x)
+            {
+                // 스크린 좌표 -> 뷰포트 좌표
+                const float yy  = kViewportHeightHalf - (static_cast<float>(y) + 0.5f) * kPixelH;
+                const float xx  = (static_cast<float>(x) + 0.5f) * kPixelW - kViewportWidthHalf;
+                const Vec3  dir = (Vec3 { xx, yy, 0.f } - cmrPos);
+                const Ray   ray = { cmrPos, dir.Normalize() };
+                image.WriteLinear(x, y, RayColor(ray));
+            }
         }
     }
 

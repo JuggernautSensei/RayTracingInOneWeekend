@@ -20,6 +20,10 @@ private:
     std::string_view m_name   = {};
 };
 
+#define PRETTY_FUNCTION __FUNCSIG__
+
+#define CONCAT_(_x, _y) _x##_y
+#define CONCAT(_x, _y)  CONCAT_(_x, _y)
 
 #ifndef PROFILE_ENABLED
 #    ifdef DEBUG_BUILD
@@ -29,25 +33,34 @@ private:
 #    endif
 #endif
 
-#define PROFILE_TIME_UNIT_SECOND 0
-#define PROFILE_TIME_UNIT_MILLI  1
-#define PROFILE_TIME_UNIT_MICRO  2
-#define PROFILE_TIME_UNIT_NANOS  3
+#define PROFILE_TIME_UNIT_SEC 0
+#define PROFILE_TIME_UNIT_MS  1
+#define PROFILE_TIME_UNIT_US  2
+#define PROFILE_TIME_UNIT_NS  3
 
 #ifndef PROFILE_TIME_UNIT
-#    define PROFILE_TIME_UNIT PROFILE_TIME_UNIT_MILLI
+#    define PROFILE_TIME_UNIT PROFILE_TIME_UNIT_MS
 #endif
 
 #if (PROFILE_ENABLED == 1)
 
+#    define SCOPED_PROFILE_UNIT(_name, _unit) \
+        ScopedProfile CONCAT(profile_, __LINE__) { _name, _unit }
+
 #    define SCOPED_PROFILE(_name) \
-        Jam::ScopedProfile CONCAT(profile_, __LINE__) { _name, static_cast<Jam::eSIPrefix>(PROFILE_TIME_UNIT) }
+        SCOPED_PROFILE_UNIT(_name, static_cast<eTimeUnit>(PROFILE_TIME_UNIT))
+
+#    define FUNCTION_PROFILE_UNIT(_unit) \
+        SCOPED_PROFILE_UNIT(PRETTY_FUNCTION, _unit)
 
 #    define FUNCTION_PROFILE() \
         SCOPED_PROFILE(PRETTY_FUNCTION)
 
 #else
 
-#    define SCOPED_PROFILE(_name) NOOP
+#    define SCOPED_PROFILE_UNIT(_name, _unit) __noop
+#    define SCOPED_PROFILE(_name)             __noop
+#    define FUNCTION_PROFILE_UNIT(_unit)      __noop
+#    define FUNCTION_PROFILE()                __noop
 
 #endif
