@@ -1,6 +1,16 @@
 .vs/
 Bin/
 Inter/
+
 *.pch
 *.obj
 *.pdb
+*.ilk
+*.exe
+*.dll
+
+*.tlog
+*.log
+*.recipe
+*.lastbuildstate
+*.idb
