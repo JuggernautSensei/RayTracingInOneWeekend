@@ -16,7 +16,7 @@ namespace fs = std::filesystem;
 #include "Timer.h"
 
 constexpr std::string_view kOutputDir  = "Outputs";
-constexpr std::string_view kSampleName = "7. Moving Camera Code Into Its Own Class";
+constexpr std::string_view kSampleName = "8. Antialiasing";
 
 void SaveImageBuffer(
     const RGBImageBuffer& _image)
@@ -34,7 +34,7 @@ void SaveImageBuffer(
 int main()
 {
     constexpr float kDesireAspectRatio = 16.f / 9.f;
-    constexpr Int32 kHeight            = 512*64;
+    constexpr Int32 kHeight            = 512;
     constexpr Int32 kWidth             = static_cast<Int32>(kHeight * kDesireAspectRatio);
 
     // world
@@ -44,6 +44,7 @@ int main()
 
     // camera
     Camera camera = { kWidth, kHeight };
+    camera.SetSample(32);
     camera.Render(world);
     SaveImageBuffer(camera.GetImageBuffer());
     return 0;

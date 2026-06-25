@@ -44,6 +44,9 @@
     <ClCompile Include="Camera.cpp">
       <Filter>World</Filter>
     </ClCompile>
+    <ClCompile Include="Random.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include=".clang-format" />
@@ -107,6 +110,9 @@
     </ClInclude>
     <ClInclude Include="Camera.h">
       <Filter>World</Filter>
+    </ClInclude>
+    <ClInclude Include="Random.h">
+      <Filter>Math</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -8,6 +8,7 @@ struct Interval
     [[nodiscard]] float Size() const;
     [[nodiscard]] bool  Contains(float _value) const;
     [[nodiscard]] bool  Surrounds(float _value) const;
+    [[nodiscard]] float Clamp(float _value) const;
 
     static const Interval kEmpty;
     static const Interval kUniverse;

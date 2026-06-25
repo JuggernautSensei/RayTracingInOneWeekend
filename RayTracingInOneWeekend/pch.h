@@ -2,6 +2,7 @@
 
 #define PROFILE_ENABLED 1
 
+#include <atomic>
 #include <cstdint>
 #include <format>
 #include <iostream>

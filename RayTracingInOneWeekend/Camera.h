@@ -1,5 +1,6 @@
 #pragma once
 #include "Image.h"
+#include "Random.h"
 
 class IHittable;
 
@@ -7,17 +8,19 @@ class Camera
 {
 public:
     Camera() = default;
-    Camera(Int32 _width, Int32 _height, Vec3 _center = Vec3::kZero, float _fovRad = ToRad(90.f));
+    Camera(Int32 _width, Int32 _height);
 
     void SetWidth(Int32 _width);
     void SetHeight(Int32 _height);
     void SetCenter(Vec3 _center);
     void SetFOV(float _fovRad);
+    void SetSample(Int32 _sample);
 
     [[nodiscard]] Int32 GetWidth() const;
     [[nodiscard]] Int32 GetHeight() const;
     [[nodiscard]] Vec3  GetCenter() const;
     [[nodiscard]] float GetFOV() const;
+    [[nodiscard]] Int32 GetSample() const;
 
     void Render(const IHittable& _world);
 
@@ -35,6 +38,10 @@ private:
 
     Vec3  m_center = Vec3::kZero;
     float m_fovRad = ToRad(90.f);
+
+    // anti-aliasing
+    Int32               m_sample = 1;   // 1픽셀당 샘플링 횟수
+    RandomGeneratorSHR3 m_rng { kRandomDeviceSeed };
 
     // palette
     float          m_viewportWidth = 0.f;

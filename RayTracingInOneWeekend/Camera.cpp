@@ -9,13 +9,9 @@
 
 Camera::Camera(
     const Int32 _width,
-    const Int32 _height,
-    const Vec3  _center,
-    const float _fovRad)
+    const Int32 _height)
     : m_width(_width)
     , m_height(_height)
-    , m_center(_center)
-    , m_fovRad(_fovRad)
 {
 }
 
@@ -61,6 +57,12 @@ void Camera::SetFOV(
     m_bPaletteDirty = true;
 }
 
+void Camera::SetSample(
+    const Int32 _sample)
+{
+    m_sample = _sample;
+}
+
 Int32 Camera::GetWidth() const
 {
     return m_width;
@@ -81,25 +83,64 @@ float Camera::GetFOV() const
     return m_fovRad;
 }
 
+Int32 Camera::GetSample() const
+{
+    return m_sample;
+}
+
 void Camera::Render(const IHittable& _world)
 {
     FUNCTION_PROFILE();
     UpdatePaletteIfNeed_();
 
-    const float viewportWidthHalf = m_viewportWidth * 0.5f;
+    const float        viewportWidthHalf = m_viewportWidth * 0.5f;
+    std::atomic<Int32> completed         = 0;
 
 #pragma omp parallel for schedule(dynamic)
     for (Int32 y = 0; y < m_height; ++y)
     {
         for (Int32 x = 0; x < m_width; ++x)
         {
-            const float yy  = kViewportHeightHalf - (static_cast<float>(y) + 0.5f) * m_pixelH;
-            const float xx  = -viewportWidthHalf + (static_cast<float>(x) + 0.5f) * m_pixelW;
-            const Vec3  dir = (Vec3 { xx, yy, m_focalLength } - m_center).Normalize();
-            const Ray   ray = { m_center, dir };
-            m_imageBuffer.WriteLinear(x, y, RayColor_(ray, _world));
+            Vec3 color = Vec3::kZero;
+            if (m_sample == 1)   // non-anti-aliasing
+            {
+                const float yy     = kViewportHeightHalf - (static_cast<float>(y) + 0.5f) * m_pixelH;
+                const float xx     = -viewportWidthHalf + (static_cast<float>(x) + 0.5f) * m_pixelW;
+                const Vec3  pixel  = { xx, yy, m_focalLength };
+                const Vec3  origin = (pixel - m_center).Normalize();
+                const Ray   ray    = { m_center, origin };
+                color              = RayColor_(ray, _world);
+            }
+            else   // anti-aliasing
+            {
+                for (int i = 0; i < m_sample; ++i)
+                {
+                    const Vec3  offset = { MakeRandom<float>(m_rng, 0.f, 1.f), MakeRandom<float>(m_rng, 0.f, 1.f), 0.f };
+                    const float xx     = -viewportWidthHalf + (static_cast<float>(x) + offset.x) * m_pixelW;
+                    const float yy     = kViewportHeightHalf - (static_cast<float>(y) + offset.y) * m_pixelH;
+                    const Vec3  pixel  = { xx, yy, m_focalLength };
+                    const Vec3  origin = (pixel - m_center).Normalize();
+                    const Ray   ray    = { m_center, origin };
+                    color += RayColor_(ray, _world);
+                }
+                color /= static_cast<float>(m_sample);
+            }
+
+            m_imageBuffer.WriteLinear(x, y, color);
+        }
+
+        const Int32 done = ++completed;
+        if (done % 10 == 0 || done == m_height)
+        {
+#pragma omp critical
+            {
+                const float progress = static_cast<float>(done) / static_cast<float>(m_height);
+                std::cout << "\rRendering: [" << done * m_width << "/" << m_height * m_width << "] " << 100.f * progress << "%      " << std::flush;
+            }
         }
     }
+
+    std::cout << "\n";
 }
 
 const RGBImageBuffer& Camera::GetImageBuffer() const

@@ -1,6 +1,7 @@
 .vs/
 Bin/
 Inter/
+Output/
 
 *.pch
 *.obj
@@ -8,6 +9,7 @@ Inter/
 *.ilk
 *.exe
 *.dll
+*.ipch
 
 *.tlog
 *.log

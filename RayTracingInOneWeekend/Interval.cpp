@@ -28,3 +28,9 @@ bool Interval::Surrounds(
 {
     return min < _value && _value < max;
 }
+
+float Interval::Clamp(
+    const float _value) const
+{
+    return ::Clamp(_value, min, max);
+}
