@@ -1,43 +1,36 @@
 #include "pch.h"
+
+#include <filesystem>
+#include <format>
+#include <string>
+#include <string_view>
+namespace fs = std::filesystem;
+
+#include "HittableList.h"
+#include "IHittable.h"
 #include "Image.h"
+#include "Interval.h"
 #include "Profile.h"
+#include "Sphere.h"
 #include "Timer.h"
 
 constexpr std::string_view kOutputDir  = "Outputs";
 constexpr std::string_view kSampleName = "6. Surface Normals and Multiple Objects";
 
-bool HitSphere(
-    const Vec3  _center,
-    const float _radius,
-    const Ray&  _ray)
+Vec3 RayColor(
+    const Ray&       _ray,
+    const IHittable& world)
 {
-    const Vec3  qc        = _ray.origin - _center;
-    const float a         = _ray.dir.Dot(_ray.dir);
-    const float b         = 2.f * qc.Dot(_ray.dir);
-    const float c         = qc.Dot(qc) - _radius * _radius;
-    const float quadratic = b * b - 4.f * a * c;
-
-    if (quadratic < 0) // 충돌하지 못함
+    HitRecord      record   = {};
+    const Interval interval = { 0.f, Max<float>() };
+    if (world.Hit(_ray, interval, record))
     {
-        return false;
+        return record.normal * 0.5f + Vec3 { 0.5f };
     }
 
-    // return quadratic >= 0.f;
-}
-
-Vec3 RayColor(
-    const Ray _ray)
-{
-    ASSERT(_ray.dir.IsNormalized(), "Ray direction must be normalized.");
     constexpr Vec3 kWhite { 1.f };
     constexpr Vec3 kSky = { 0.5f, 0.7f, 1.f };
-
-    if (HitSphere({ 0.f, 0.f, 1.f }, 0.5f, _ray))
-    {
-        return { 1.f, 0.f, 0.f };
-    }
-
-    float a = 0.5f * (_ray.dir.y + 1.f);
+    const float    a    = 0.5f * (_ray.dir.y + 1.f);
     return kWhite.Lerp(kSky, a);
 }
 
@@ -58,7 +51,7 @@ int main()
 {
     // 이미지 spec
     constexpr float kDesireAspectRatio = 16.f / 9.f;
-    const Int32     kHeight            = 256;
+    const Int32     kHeight            = 512;
     const Int32     kWidth             = static_cast<Int32>(kHeight * kDesireAspectRatio);
     constexpr float kAspectRatio       = static_cast<float>(kWidth) / static_cast<float>(kHeight);
 
@@ -77,11 +70,17 @@ int main()
     const float focalLength = (kViewportHeight / 2.f) / ::tanf(kFieldOfView / 2.f);
     const Vec3  cmrPos      = { 0.f, 0.f, 0.f };
 
+    // world
+    HittableList world = {};
+    world.Add(std::make_unique<Sphere>(Vec3 { 0.f, 0.f, 1.f }, 0.5f));
+    world.Add(std::make_unique<Sphere>(Vec3 { 0.f, -100.5f, 1.f }, 100.f));
+
     RGBImageBuffer image = { kWidth, kHeight };
 
     {
         SCOPED_PROFILE("Rendering Image");
 
+#pragma omp parallel for schedule(dynamic)
         for (Int32 y = 0; y < kHeight; ++y)
         {
             for (Int32 x = 0; x < kWidth; ++x)
@@ -91,7 +90,7 @@ int main()
                 const float xx  = (static_cast<float>(x) + 0.5f) * kPixelW - kViewportWidthHalf;
                 const Vec3  dir = (Vec3 { xx, yy, focalLength } - cmrPos);
                 const Ray   ray = { cmrPos, dir.Normalize() };
-                image.WriteLinear(x, y, RayColor(ray));
+                image.WriteLinear(x, y, RayColor(ray, world));
             }
         }
     }

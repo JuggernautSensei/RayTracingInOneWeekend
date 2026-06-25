@@ -2,58 +2,72 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClCompile Include="Main.cpp" />
-    <ClCompile Include="Vector.cpp">
-      <Filter>Math</Filter>
-    </ClCompile>
-    <ClCompile Include="DataType.cpp">
-      <Filter>Base</Filter>
-    </ClCompile>
     <ClCompile Include="pch.cpp">
       <Filter>Base</Filter>
     </ClCompile>
-    <ClCompile Include="Math.cpp">
-      <Filter>Math</Filter>
-    </ClCompile>
-    <ClCompile Include="Ray.cpp">
-      <Filter>Math</Filter>
+    <ClCompile Include="Timer.cpp">
+      <Filter>Utils</Filter>
     </ClCompile>
     <ClCompile Include="Assertion.cpp">
       <Filter>Base</Filter>
     </ClCompile>
-    <ClCompile Include="Image.cpp" />
-    <ClCompile Include="Timer.cpp">
+    <ClCompile Include="DataType.cpp">
       <Filter>Base</Filter>
     </ClCompile>
+    <ClCompile Include="Ray.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="Vector.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
     <ClCompile Include="Profile.cpp">
-      <Filter>Base</Filter>
+      <Filter>Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="Math.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="IHittable.cpp">
+      <Filter>Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Sphere.cpp">
+      <Filter>Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Image.cpp">
+      <Filter>Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="HittableList.cpp">
+      <Filter>Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Interval.cpp">
+      <Filter>Scene</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include=".clang-format" />
   </ItemGroup>
   <ItemGroup>
-    <Filter Include="Math">
-      <UniqueIdentifier>{59790a0a-d206-4094-a45d-8fa66b7f6c78}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Base">
       <UniqueIdentifier>{eaf0c77f-debd-46f7-b779-4febcee77db0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Scene">
+      <UniqueIdentifier>{2012aaf9-ad09-453b-8ac7-fbedf920d49c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Math">
+      <UniqueIdentifier>{59790a0a-d206-4094-a45d-8fa66b7f6c78}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Utils">
+      <UniqueIdentifier>{8bfcdcff-c37a-41d1-b5e6-691862877d96}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Vector.h">
-      <Filter>Math</Filter>
-    </ClInclude>
-    <ClInclude Include="DataType.h">
-      <Filter>Base</Filter>
-    </ClInclude>
     <ClInclude Include="pch.h">
       <Filter>Base</Filter>
     </ClInclude>
-    <ClInclude Include="Math.h">
-      <Filter>Math</Filter>
+    <ClInclude Include="Timer.h">
+      <Filter>Utils</Filter>
     </ClInclude>
-    <ClInclude Include="Ray.h">
-      <Filter>Math</Filter>
+    <ClInclude Include="DataType.h">
+      <Filter>Base</Filter>
     </ClInclude>
     <ClInclude Include="Assertion.h">
       <Filter>Base</Filter>
@@ -61,12 +75,32 @@
     <ClInclude Include="Config.h">
       <Filter>Base</Filter>
     </ClInclude>
-    <ClInclude Include="Image.h" />
-    <ClInclude Include="Timer.h">
-      <Filter>Base</Filter>
+    <ClInclude Include="Vector.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Ray.h">
+      <Filter>Math</Filter>
     </ClInclude>
     <ClInclude Include="Profile.h">
-      <Filter>Base</Filter>
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Math.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="IHittable.h">
+      <Filter>Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Sphere.h">
+      <Filter>Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Image.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="HittableList.h">
+      <Filter>Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Interval.h">
+      <Filter>Scene</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

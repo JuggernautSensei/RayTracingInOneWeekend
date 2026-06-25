@@ -44,23 +44,23 @@ private:
 
 #if (PROFILE_ENABLED == 1)
 
-#    define SCOPED_PROFILE_UNIT(_name, _unit) \
+#    define SCOPED_PROFILE_EX(_name, _unit) \
         ScopedProfile CONCAT(profile_, __LINE__) { _name, _unit }
 
 #    define SCOPED_PROFILE(_name) \
-        SCOPED_PROFILE_UNIT(_name, static_cast<eTimeUnit>(PROFILE_TIME_UNIT))
+        SCOPED_PROFILE_EX(_name, static_cast<eTimeUnit>(PROFILE_TIME_UNIT))
 
-#    define FUNCTION_PROFILE_UNIT(_unit) \
-        SCOPED_PROFILE_UNIT(PRETTY_FUNCTION, _unit)
+#    define FUNCTION_PROFILE_EX(_unit) \
+        SCOPED_PROFILE_EX(PRETTY_FUNCTION, _unit)
 
 #    define FUNCTION_PROFILE() \
         SCOPED_PROFILE(PRETTY_FUNCTION)
 
 #else
 
-#    define SCOPED_PROFILE_UNIT(_name, _unit) __noop
-#    define SCOPED_PROFILE(_name)             __noop
-#    define FUNCTION_PROFILE_UNIT(_unit)      __noop
-#    define FUNCTION_PROFILE()                __noop
+#    define SCOPED_PROFILE_EX(_name, _unit) __noop
+#    define SCOPED_PROFILE(_name)           __noop
+#    define FUNCTION_PROFILE_EX(_unit)      __noop
+#    define FUNCTION_PROFILE()              __noop
 
 #endif

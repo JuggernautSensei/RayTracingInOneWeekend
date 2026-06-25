@@ -1,5 +1,7 @@
 #pragma once
 
+#define PROFILE_ENABLED 1
+
 #include <cstdint>
 #include <format>
 #include <iostream>
@@ -15,6 +17,8 @@ namespace fs = std::filesystem;
 #include "Config.h"
 #include "DataType.h"
 #include "Assertion.h"
+
+// util
 #include "Profile.h"
 
 // math

@@ -60,7 +60,7 @@ struct Vec3
         return *this;
     }
 
-    constexpr [[nodiscard]] Vec3 operator+(
+    [[nodiscard]] constexpr Vec3 operator+(
         const Vec3 _other) const
     {
         Vec3 v = *this;
@@ -70,7 +70,7 @@ struct Vec3
         return v;
     }
 
-    constexpr [[nodiscard]] Vec3 operator-(
+    [[nodiscard]] constexpr Vec3 operator-(
         const Vec3 _other) const
     {
         Vec3 v = *this;
@@ -80,7 +80,7 @@ struct Vec3
         return v;
     }
 
-    constexpr [[nodiscard]] Vec3 operator*(
+    [[nodiscard]] constexpr Vec3 operator*(
         const float _scalar) const
     {
         Vec3 v = *this;
@@ -90,7 +90,7 @@ struct Vec3
         return v;
     }
 
-    constexpr [[nodiscard]] Vec3 operator/(
+    [[nodiscard]] constexpr Vec3 operator/(
         const float _scalar) const
     {
         Vec3 v = *this;
@@ -102,13 +102,18 @@ struct Vec3
         return v;
     }
 
-    constexpr [[nodiscard]] float Dot(
+    [[nodiscard]] constexpr Vec3 operator-() const
+    {
+        return { -x, -y, -z };
+    }
+
+    [[nodiscard]] constexpr float Dot(
         const Vec3 _other) const
     {
         return x * _other.x + y * _other.y + z * _other.z;
     }
 
-    constexpr [[nodiscard]] Vec3 Cross(
+    [[nodiscard]] constexpr Vec3 Cross(
         const Vec3 _other) const
     {
         return {
@@ -118,7 +123,7 @@ struct Vec3
         };
     }
 
-    constexpr [[nodiscard]] Vec3 Lerp(
+    [[nodiscard]] constexpr Vec3 Lerp(
         const Vec3  _other,
         const float _t) const
     {
@@ -129,7 +134,7 @@ struct Vec3
         };
     }
 
-    constexpr [[nodiscard]] float LengthSq() const
+    [[nodiscard]] constexpr float LengthSq() const
     {
         return Dot(*this);
     }
@@ -150,14 +155,14 @@ struct Vec3
         return ::IsEqualApprox(LengthSq(), 1.f);
     }
 
-    constexpr [[nodiscard]] bool IsZeroApprox() const
+    [[nodiscard]] constexpr bool IsZeroApprox() const
     {
         return ::IsZeroApprox(x)
             && ::IsZeroApprox(y)
             && ::IsZeroApprox(z);
     }
 
- constexpr [[nodiscard]] bool IsEqualApprox(
+    [[nodiscard]] constexpr bool IsEqualApprox(
         const Vec3 _other) const
     {
         return ::IsEqualApprox(x, _other.x)
