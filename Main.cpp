@@ -4,35 +4,19 @@
 #include <format>
 #include <string>
 #include <string_view>
+
+#include "Camera.h"
 namespace fs = std::filesystem;
 
 #include "HittableList.h"
 #include "IHittable.h"
 #include "Image.h"
-#include "Interval.h"
 #include "Profile.h"
 #include "Sphere.h"
 #include "Timer.h"
 
 constexpr std::string_view kOutputDir  = "Outputs";
-constexpr std::string_view kSampleName = "6. Surface Normals and Multiple Objects";
-
-Vec3 RayColor(
-    const Ray&       _ray,
-    const IHittable& world)
-{
-    HitRecord      record   = {};
-    const Interval interval = { 0.f, Max<float>() };
-    if (world.Hit(_ray, interval, record))
-    {
-        return record.normal * 0.5f + Vec3 { 0.5f };
-    }
-
-    constexpr Vec3 kWhite { 1.f };
-    constexpr Vec3 kSky = { 0.5f, 0.7f, 1.f };
-    const float    a    = 0.5f * (_ray.dir.y + 1.f);
-    return kWhite.Lerp(kSky, a);
-}
+constexpr std::string_view kSampleName = "7. Moving Camera Code Into Its Own Class";
 
 void SaveImageBuffer(
     const RGBImageBuffer& _image)
@@ -49,52 +33,18 @@ void SaveImageBuffer(
 
 int main()
 {
-    // 이미지 spec
     constexpr float kDesireAspectRatio = 16.f / 9.f;
-    const Int32     kHeight            = 512;
-    const Int32     kWidth             = static_cast<Int32>(kHeight * kDesireAspectRatio);
-    constexpr float kAspectRatio       = static_cast<float>(kWidth) / static_cast<float>(kHeight);
-
-    // 뷰포트 spec
-    constexpr float kViewportHeight     = 2.f;
-    constexpr float kViewportWidth      = kViewportHeight * kAspectRatio;
-    constexpr float kViewportHeightHalf = kViewportHeight / 2.f;
-    constexpr float kViewportWidthHalf  = kViewportWidth / 2.f;
-    constexpr float kFieldOfView        = ToRad(90.f);   // 시야각
-
-    // 1픽셀이 뷰포트에서 차지하는 크기
-    constexpr float kPixelW = kViewportWidth / static_cast<float>(kWidth);
-    constexpr float kPixelH = kViewportHeight / static_cast<float>(kHeight);
-
-    // 카메라 위치 계산
-    const float focalLength = (kViewportHeight / 2.f) / ::tanf(kFieldOfView / 2.f);
-    const Vec3  cmrPos      = { 0.f, 0.f, 0.f };
+    constexpr Int32 kHeight            = 512*64;
+    constexpr Int32 kWidth             = static_cast<Int32>(kHeight * kDesireAspectRatio);
 
     // world
     HittableList world = {};
     world.Add(std::make_unique<Sphere>(Vec3 { 0.f, 0.f, 1.f }, 0.5f));
     world.Add(std::make_unique<Sphere>(Vec3 { 0.f, -100.5f, 1.f }, 100.f));
 
-    RGBImageBuffer image = { kWidth, kHeight };
-
-    {
-        SCOPED_PROFILE("Rendering Image");
-
-#pragma omp parallel for schedule(dynamic)
-        for (Int32 y = 0; y < kHeight; ++y)
-        {
-            for (Int32 x = 0; x < kWidth; ++x)
-            {
-                // 스크린 좌표 -> 뷰포트 좌표
-                const float yy  = kViewportHeightHalf - (static_cast<float>(y) + 0.5f) * kPixelH;
-                const float xx  = (static_cast<float>(x) + 0.5f) * kPixelW - kViewportWidthHalf;
-                const Vec3  dir = (Vec3 { xx, yy, focalLength } - cmrPos);
-                const Ray   ray = { cmrPos, dir.Normalize() };
-                image.WriteLinear(x, y, RayColor(ray, world));
-            }
-        }
-    }
-
-    SaveImageBuffer(image);
+    // camera
+    Camera camera = { kWidth, kHeight };
+    camera.Render(world);
+    SaveImageBuffer(camera.GetImageBuffer());
     return 0;
 }

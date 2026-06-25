@@ -27,19 +27,22 @@
       <Filter>Math</Filter>
     </ClCompile>
     <ClCompile Include="IHittable.cpp">
-      <Filter>Scene</Filter>
+      <Filter>World</Filter>
     </ClCompile>
     <ClCompile Include="Sphere.cpp">
-      <Filter>Scene</Filter>
+      <Filter>World</Filter>
     </ClCompile>
     <ClCompile Include="Image.cpp">
       <Filter>Utils</Filter>
     </ClCompile>
     <ClCompile Include="HittableList.cpp">
-      <Filter>Scene</Filter>
+      <Filter>World</Filter>
     </ClCompile>
     <ClCompile Include="Interval.cpp">
-      <Filter>Scene</Filter>
+      <Filter>World</Filter>
+    </ClCompile>
+    <ClCompile Include="Camera.cpp">
+      <Filter>World</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -49,14 +52,14 @@
     <Filter Include="Base">
       <UniqueIdentifier>{eaf0c77f-debd-46f7-b779-4febcee77db0}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Scene">
-      <UniqueIdentifier>{2012aaf9-ad09-453b-8ac7-fbedf920d49c}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Math">
       <UniqueIdentifier>{59790a0a-d206-4094-a45d-8fa66b7f6c78}</UniqueIdentifier>
     </Filter>
     <Filter Include="Utils">
       <UniqueIdentifier>{8bfcdcff-c37a-41d1-b5e6-691862877d96}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="World">
+      <UniqueIdentifier>{2012aaf9-ad09-453b-8ac7-fbedf920d49c}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -88,19 +91,22 @@
       <Filter>Math</Filter>
     </ClInclude>
     <ClInclude Include="IHittable.h">
-      <Filter>Scene</Filter>
+      <Filter>World</Filter>
     </ClInclude>
     <ClInclude Include="Sphere.h">
-      <Filter>Scene</Filter>
+      <Filter>World</Filter>
     </ClInclude>
     <ClInclude Include="Image.h">
       <Filter>Utils</Filter>
     </ClInclude>
     <ClInclude Include="HittableList.h">
-      <Filter>Scene</Filter>
+      <Filter>World</Filter>
     </ClInclude>
     <ClInclude Include="Interval.h">
-      <Filter>Scene</Filter>
+      <Filter>World</Filter>
+    </ClInclude>
+    <ClInclude Include="Camera.h">
+      <Filter>World</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
