@@ -205,6 +205,18 @@ struct Vec3
         return *this - _normal * 2.f * Dot(_normal);
     }
 
+    [[nodiscard]] Vec3 Refract(
+        const Vec3  _normal,
+        const float _eta) const
+    {
+        ASSERT(_normal.IsNormalized(), "Refract() must be called with a normalized normal vector.");
+
+        const float rDotn    = Min(-Dot(_normal), 1.f);
+        const Vec3  perp     = (*this + _normal * rDotn) * _eta;
+        const Vec3  parallel = _normal * -::sqrtf(Abs(1.f - perp.LengthSq()));
+        return perp + parallel;
+    }
+
     static Vec3 kZero;
     static Vec3 kOne;
     static Vec3 kUnitX;

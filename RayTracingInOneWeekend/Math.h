@@ -102,17 +102,17 @@ template<typename T>
 }
 
 template<typename T>
-[[nodiscard]] constexpr float Min(
-    const float _x,
-    const float _y)
+[[nodiscard]] constexpr T Min(
+    const T _x,
+    const T _y)
 {
     return _x < _y ? _x : _y;
 }
 
 template<typename T>
-[[nodiscard]] constexpr float Max(
-    const float _x,
-    const float _y)
+[[nodiscard]] constexpr T Max(
+    const T _x,
+    const T _y)
 {
     return _x > _y ? _x : _y;
 }
