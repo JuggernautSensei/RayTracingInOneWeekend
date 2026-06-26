@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "Random.h"
 
-namespace Details
+namespace
 {
 
 UInt64 MakeRandomDeviceSeed() noexcept
@@ -10,7 +10,7 @@ UInt64 MakeRandomDeviceSeed() noexcept
     return (static_cast<UInt64>(rd()) << 32) | rd();
 }
 
-}   // namespace Details
+}   // namespace
 
 RandomGeneratorSHR3::RandomGeneratorSHR3(
     const UInt64 _seed) noexcept
@@ -20,22 +20,23 @@ RandomGeneratorSHR3::RandomGeneratorSHR3(
 
 RandomGeneratorSHR3::RandomGeneratorSHR3(
     RandomDeviceSeed) noexcept
-    : m_jsr(Details::MakeRandomDeviceSeed())
+    : m_jsr(MakeRandomDeviceSeed())
 {
 }
 
-void RandomGeneratorSHR3::Reseed(const UInt64 _seed) noexcept
+void RandomGeneratorSHR3::Reseed(
+    const UInt64 _seed) noexcept
 {
     m_jsr = _seed;
 }
 
-void RandomGeneratorSHR3::Reseed(RandomDeviceSeed) noexcept
+void RandomGeneratorSHR3::Reseed(
+    RandomDeviceSeed) noexcept
 {
-    m_jsr = Details::MakeRandomDeviceSeed();
+    m_jsr = MakeRandomDeviceSeed();
 }
 
-[[nodiscard]]
-UInt64 RandomGeneratorSHR3::Generate() noexcept
+[[nodiscard]] UInt64 RandomGeneratorSHR3::Generate() noexcept
 {
     m_jsr ^= (m_jsr << 13);
     m_jsr ^= (m_jsr >> 7);
@@ -43,28 +44,34 @@ UInt64 RandomGeneratorSHR3::Generate() noexcept
     return m_jsr;
 }
 
-RandomGeneratorMWC::RandomGeneratorMWC(const UInt64 _seedZ, const UInt64 _seedW) noexcept
+RandomGeneratorMWC::RandomGeneratorMWC(
+    const UInt64 _seedZ,
+    const UInt64 _seedW) noexcept
     : m_z(_seedZ)
     , m_w(_seedW)
 {
 }
 
-RandomGeneratorMWC::RandomGeneratorMWC(RandomDeviceSeed) noexcept
-    : m_z(Details::MakeRandomDeviceSeed())
-    , m_w(Details::MakeRandomDeviceSeed())
+RandomGeneratorMWC::RandomGeneratorMWC(
+    RandomDeviceSeed) noexcept
+    : m_z(MakeRandomDeviceSeed())
+    , m_w(MakeRandomDeviceSeed())
 {
 }
 
-void RandomGeneratorMWC::Reseed(const UInt64 _seedZ, const UInt64 _seedW) noexcept
+void RandomGeneratorMWC::Reseed(
+    const UInt64 _seedZ,
+    const UInt64 _seedW) noexcept
 {
     m_z = _seedZ;
     m_w = _seedW;
 }
 
-void RandomGeneratorMWC::Reseed(RandomDeviceSeed) noexcept
+void RandomGeneratorMWC::Reseed(
+    RandomDeviceSeed) noexcept
 {
-    m_z = Details::MakeRandomDeviceSeed();
-    m_w = Details::MakeRandomDeviceSeed();
+    m_z = MakeRandomDeviceSeed();
+    m_w = MakeRandomDeviceSeed();
 }
 
 UInt64 RandomGeneratorMWC::Generate() noexcept
@@ -74,24 +81,28 @@ UInt64 RandomGeneratorMWC::Generate() noexcept
     return (m_z << 32) + m_w;
 }
 
-RandomGeneratorMT19937::RandomGeneratorMT19937(const UInt64 _seed) noexcept
+RandomGeneratorMT19937::RandomGeneratorMT19937(
+    const UInt64 _seed) noexcept
     : m_mt(_seed)
 {
 }
 
-RandomGeneratorMT19937::RandomGeneratorMT19937(RandomDeviceSeed) noexcept
-    : m_mt(Details::MakeRandomDeviceSeed())
+RandomGeneratorMT19937::RandomGeneratorMT19937(
+    RandomDeviceSeed) noexcept
+    : m_mt(MakeRandomDeviceSeed())
 {
 }
 
-void RandomGeneratorMT19937::Reseed(const UInt64 _seed) noexcept
+void RandomGeneratorMT19937::Reseed(
+    const UInt64 _seed) noexcept
 {
     m_mt.seed(_seed);
 }
 
-void RandomGeneratorMT19937::Reseed(RandomDeviceSeed) noexcept
+void RandomGeneratorMT19937::Reseed(
+    RandomDeviceSeed) noexcept
 {
-    m_mt = std::mt19937_64 { Details::MakeRandomDeviceSeed() };
+    m_mt = std::mt19937_64 { MakeRandomDeviceSeed() };
 }
 
 UInt64 RandomGeneratorMT19937::Generate() noexcept

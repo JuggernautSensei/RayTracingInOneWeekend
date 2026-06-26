@@ -1,11 +1,50 @@
 #include "pch.h"
 #include "Camera.h"
 
+#include <thread>
+
 #include "IHittable.h"
 #include "Interval.h"
+#include "RandomUtils.h"
 
-#include <omp.h>
-#include <thread>
+namespace
+{
+[[nodiscard]] Vec3 GenerateRandomUnitVecOnSphere()
+{
+    while (true)
+    {
+        Vec3        vec   = { GenerateRandomSHR3<float>(-1.f, 1.f), GenerateRandomSHR3<float>(-1.f, 1.f), GenerateRandomSHR3<float>(-1.f, 1.f) };
+        const float lenSq = vec.LengthSq();
+        if (lenSq >= 1.f || IsZeroApprox(lenSq))
+        {
+            continue;
+        }
+
+        vec = vec / ::sqrtf(lenSq);
+        return vec;
+    }
+}
+
+[[nodiscard]] Vec3 GammaCorrection(
+    const Vec3  _linearColor,
+    const float _gamma)
+{
+    const float invGamma = 1.f / _gamma;
+    return {
+        ::powf(_linearColor.r, invGamma),
+        ::powf(_linearColor.g, invGamma),
+        ::powf(_linearColor.b, invGamma)
+    };
+}
+
+[[nodiscard]] Vec3 GenerateRandomUnitVec3OnHemisphere(
+    const Vec3 _normal)
+{
+    const Vec3 vec = GenerateRandomUnitVecOnSphere();
+    return vec.Dot(_normal) > 0.f ? vec : -vec;
+}
+
+}   // namespace
 
 Camera::Camera(
     const Int32 _width,
@@ -109,24 +148,24 @@ void Camera::Render(const IHittable& _world)
                 const Vec3  pixel  = { xx, yy, m_focalLength };
                 const Vec3  origin = (pixel - m_center).Normalize();
                 const Ray   ray    = { m_center, origin };
-                color              = RayColor_(ray, _world);
+                color              = RayColor_(ray, 0, _world);
             }
             else   // anti-aliasing
             {
                 for (int i = 0; i < m_sample; ++i)
                 {
-                    const Vec3  offset = { MakeRandom<float>(m_rng, 0.f, 1.f), MakeRandom<float>(m_rng, 0.f, 1.f), 0.f };
+                    const Vec3  offset = { GenerateRandomSHR3<float>(0.f, 1.f), GenerateRandomSHR3<float>(0.f, 1.f), 0.f };
                     const float xx     = -viewportWidthHalf + (static_cast<float>(x) + offset.x) * m_pixelW;
                     const float yy     = kViewportHeightHalf - (static_cast<float>(y) + offset.y) * m_pixelH;
                     const Vec3  pixel  = { xx, yy, m_focalLength };
                     const Vec3  origin = (pixel - m_center).Normalize();
                     const Ray   ray    = { m_center, origin };
-                    color += RayColor_(ray, _world);
+                    color += RayColor_(ray, 0, _world);
                 }
                 color /= static_cast<float>(m_sample);
             }
 
-            m_imageBuffer.WriteLinear(x, y, color);
+            m_imageBuffer.WriteLinear(x, y, GammaCorrection(color, 2.f));
         }
 
         const Int32 done = ++completed;
@@ -167,13 +206,21 @@ void Camera::UpdatePaletteIfNeed_()
 
 Vec3 Camera::RayColor_(
     const Ray&       _ray,
-    const IHittable& _world) const
+    const Int32      _depth,
+    const IHittable& _world)
 {
+    if (_depth > m_maxDepth)
+    {
+        return Vec3::kZero;
+    }
+
     HitRecord      record   = {};
-    const Interval interval = { 0.f, Max<float>() };
+    const Interval interval = { 0.001f, Max<float>() };
     if (_world.Hit(_ray, interval, record))
     {
-        return record.normal * 0.5f + Vec3 { 0.5f };
+        const Vec3 dir = (record.normal + GenerateRandomUnitVecOnSphere()).Normalize();
+        const Ray  ray = { record.point, dir };
+        return 0.5f * RayColor_(ray, _depth + 1, _world);
     }
 
     constexpr Vec3 kWhite { 1.f };
