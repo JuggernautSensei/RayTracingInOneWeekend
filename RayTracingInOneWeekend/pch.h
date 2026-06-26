@@ -16,7 +16,7 @@ namespace fs = std::filesystem;
 
 // base
 #include "Config.h"
-#include "DataType.h"
+#include "Typedef.h"
 #include "Assertion.h"
 
 // util

@@ -11,7 +11,7 @@
     <ClCompile Include="Assertion.cpp">
       <Filter>Base</Filter>
     </ClCompile>
-    <ClCompile Include="DataType.cpp">
+    <ClCompile Include="Typedef.cpp">
       <Filter>Base</Filter>
     </ClCompile>
     <ClCompile Include="Ray.cpp">
@@ -47,6 +47,9 @@
     <ClCompile Include="Random.cpp">
       <Filter>Math</Filter>
     </ClCompile>
+    <ClCompile Include="RandomUtils.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include=".clang-format" />
@@ -72,7 +75,7 @@
     <ClInclude Include="Timer.h">
       <Filter>Utils</Filter>
     </ClInclude>
-    <ClInclude Include="DataType.h">
+    <ClInclude Include="Typedef.h">
       <Filter>Base</Filter>
     </ClInclude>
     <ClInclude Include="Assertion.h">
@@ -112,6 +115,9 @@
       <Filter>World</Filter>
     </ClInclude>
     <ClInclude Include="Random.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="RandomUtils.h">
       <Filter>Math</Filter>
     </ClInclude>
   </ItemGroup>

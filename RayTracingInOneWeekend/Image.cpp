@@ -27,7 +27,10 @@ bool RGBImageBuffer::SaveToFile(
     return true;
 }
 
-void RGBImageBuffer::WriteLinear(const Int32 _x, const Int32 _y, const Vec3 _color)
+void RGBImageBuffer::WriteLinear(
+    const Int32 _x,
+    const Int32 _y,
+    const Vec3  _color)
 {
     const Vec3  rgb      = _color.Clamp(Vec3::kZero, Vec3::kOne);
     const Int32 offset   = 3 * (m_width * _y + _x);
@@ -36,7 +39,12 @@ void RGBImageBuffer::WriteLinear(const Int32 _x, const Int32 _y, const Vec3 _col
     m_pixels[offset + 2] = static_cast<UInt8>(255.f * rgb.b);
 }
 
-void RGBImageBuffer::WriteRGB(const Int32 _x, const Int32 _y, const UInt8 _r, const UInt8 _g, const UInt8 _b)
+void RGBImageBuffer::WriteRGB(
+    const Int32 _x,
+    const Int32 _y,
+    const UInt8 _r,
+    const UInt8 _g,
+    const UInt8 _b)
 {
     const Int32 offset   = 3 * (m_width * _y + _x);
     m_pixels[offset + 0] = _r;

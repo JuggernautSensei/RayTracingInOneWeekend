@@ -1,13 +1,6 @@
 #pragma once
 #include <random>
 
-namespace Details
-{
-
-[[nodiscard]] UInt64 MakeRandomDeviceSeed() noexcept;
-
-}   // namespace Details
-
 struct RandomDeviceSeed
 {
     struct Tag
@@ -66,14 +59,17 @@ private:
 };
 
 template<typename T>
-concept IsRng = requires(T t) {
+concept RandomGeneratorT = requires(T t) {
     { t.Generate() } -> std::same_as<UInt64>;
 };
 
 // Returns a random number in the range of [_min, _max].
-template<typename T, typename TRng>
-    requires IsRng<TRng> && std::is_arithmetic_v<T>
-[[nodiscard]] T MakeRandom(TRng& _rng, const T _min, const T _max) noexcept
+template<typename T, RandomGeneratorT TRng>
+    requires std::is_arithmetic_v<T>
+[[nodiscard]] T GenerateRandom(
+    TRng&   _rng,
+    const T _min,
+    const T _max) noexcept
 {
     ASSERT(_min <= _max, "Invalid range! min: {}, max: {}", _min, _max);
 

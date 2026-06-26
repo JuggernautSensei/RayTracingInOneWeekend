@@ -28,7 +28,7 @@ public:
 
 private:
     void UpdatePaletteIfNeed_();
-    Vec3 RayColor_(const Ray& _ray, const IHittable& _world) const;
+    Vec3 RayColor_(const Ray& _ray, Int32 _depth, const IHittable& _world);
 
     constexpr static float kViewportHeight     = 2.f;
     constexpr static float kViewportHeightHalf = kViewportHeight * 0.5f;
@@ -36,12 +36,10 @@ private:
     Int32 m_width  = 800;
     Int32 m_height = 600;
 
-    Vec3  m_center = Vec3::kZero;
-    float m_fovRad = ToRad(90.f);
-
-    // anti-aliasing
-    Int32               m_sample = 1;   // 1픽셀당 샘플링 횟수
-    RandomGeneratorSHR3 m_rng { kRandomDeviceSeed };
+    Vec3  m_center   = Vec3::kZero;
+    float m_fovRad   = ToRad(90.f);
+    Int32 m_sample   = 100;   // 1픽셀당 샘플링 횟수
+    Int32 m_maxDepth = 50;   // 최대 재귀 깊이
 
     // palette
     float          m_viewportWidth = 0.f;

@@ -144,7 +144,7 @@
   <ItemGroup>
     <ClCompile Include="Assertion.cpp" />
     <ClCompile Include="Camera.cpp" />
-    <ClCompile Include="DataType.cpp" />
+    <ClCompile Include="Typedef.cpp" />
     <ClCompile Include="HittableList.cpp" />
     <ClCompile Include="IHittable.cpp" />
     <ClCompile Include="Image.cpp" />
@@ -157,6 +157,7 @@
     </ClCompile>
     <ClCompile Include="Profile.cpp" />
     <ClCompile Include="Random.cpp" />
+    <ClCompile Include="RandomUtils.cpp" />
     <ClCompile Include="Ray.cpp" />
     <ClCompile Include="Sphere.cpp" />
     <ClCompile Include="Timer.cpp" />
@@ -169,7 +170,7 @@
     <ClInclude Include="Assertion.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Config.h" />
-    <ClInclude Include="DataType.h" />
+    <ClInclude Include="Typedef.h" />
     <ClInclude Include="HittableList.h" />
     <ClInclude Include="IHittable.h" />
     <ClInclude Include="Image.h" />
@@ -178,6 +179,7 @@
     <ClInclude Include="pch.h" />
     <ClInclude Include="Profile.h" />
     <ClInclude Include="Random.h" />
+    <ClInclude Include="RandomUtils.h" />
     <ClInclude Include="Ray.h" />
     <ClInclude Include="Sphere.h" />
     <ClInclude Include="Timer.h" />

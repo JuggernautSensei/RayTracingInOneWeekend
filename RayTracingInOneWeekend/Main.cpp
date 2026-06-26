@@ -1,19 +1,10 @@
 #include "pch.h"
 
-#include <filesystem>
-#include <format>
-#include <string>
-#include <string_view>
-
 #include "Camera.h"
-namespace fs = std::filesystem;
-
 #include "HittableList.h"
-#include "IHittable.h"
 #include "Image.h"
-#include "Profile.h"
 #include "Sphere.h"
-#include "Timer.h"
+
 
 constexpr std::string_view kOutputDir  = "Outputs";
 constexpr std::string_view kSampleName = "8. Antialiasing";
@@ -44,7 +35,6 @@ int main()
 
     // camera
     Camera camera = { kWidth, kHeight };
-    camera.SetSample(32);
     camera.Render(world);
     SaveImageBuffer(camera.GetImageBuffer());
     return 0;
