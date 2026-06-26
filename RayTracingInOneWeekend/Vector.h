@@ -158,7 +158,13 @@ struct Vec3
 
     [[nodiscard]] Vec3 Normalize() const
     {
-        float inv = 1.f / Length();
+        const float lenSq = LengthSq();
+        if (::IsZeroApprox(lenSq))
+        {
+            return Vec3::kZero;
+        }
+
+        const float inv = 1.f / ::sqrtf(lenSq);
         return { *this * inv };
     }
 

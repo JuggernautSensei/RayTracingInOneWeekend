@@ -8,7 +8,7 @@
 #include "Sphere.h"
 
 constexpr std::string_view kOutputDir  = "Outputs";
-constexpr std::string_view kSampleName = "8. Antialiasing";
+constexpr std::string_view kSampleName = "10. Metal";
 
 void SaveImageBuffer(
     const RGBImageBuffer& _image)
@@ -26,17 +26,16 @@ void SaveImageBuffer(
 int main()
 {
     constexpr float kDesireAspectRatio = 16.f / 9.f;
-    constexpr Int32 kHeight            = 512;
+    constexpr Int32 kHeight            = 800;
     constexpr Int32 kWidth             = static_cast<Int32>(kHeight * kDesireAspectRatio);
 
     // world
-    HittableList world = {};
-
     const std::shared_ptr<Material> pGroundMat = std::make_shared<Lambertian>(Vec3 { 0.8f, 0.8f, 0.f });
     const std::shared_ptr<Material> pCenterMat = std::make_shared<Lambertian>(Vec3 { 0.1f, 0.2f, 0.5f });
     const std::shared_ptr<Material> pLeftMat   = std::make_shared<Metal>(Vec3 { 0.8f, 0.8f, 0.8f }, 0.3f);
     const std::shared_ptr<Material> pRightMat  = std::make_shared<Metal>(Vec3 { 0.8f, 0.6f, 0.2f }, 1.f);
 
+    HittableList world = {};
     world.Add(std::make_unique<Sphere>(Vec3 { 0.f, -100.5f, 1.f }, 100.f, pGroundMat));
     world.Add(std::make_unique<Sphere>(Vec3 { 0.f, 0.f, 1.f }, 0.5f, pCenterMat));
     world.Add(std::make_unique<Sphere>(Vec3 { -1.f, 0.f, 1.f }, 0.5f, pLeftMat));

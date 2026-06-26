@@ -185,6 +185,7 @@ Vec3 Camera::RayColor_(
         {
             return attenuation * RayColor_(scattered, _depth + 1, _world);
         }
+        return Vec3::kZero;
     }
 
     constexpr Vec3 kWhite { 1.f };
