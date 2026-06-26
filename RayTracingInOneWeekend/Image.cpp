@@ -11,7 +11,7 @@ RGBImageBuffer::RGBImageBuffer(const Int32 _width, const Int32 _height)
     m_pixels = std::make_unique<UInt8[]>(m_width * m_height * 3);
 }
 
-bool RGBImageBuffer::SaveToFile(
+bool RGBImageBuffer::SaveToPngFile(
     const fs::path& _path) const
 {
     fs::create_directories(_path.parent_path());

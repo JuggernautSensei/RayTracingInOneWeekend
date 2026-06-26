@@ -144,6 +144,9 @@
   <ItemGroup>
     <ClCompile Include="Assertion.cpp" />
     <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="Lambertian.cpp" />
+    <ClCompile Include="Material.cpp" />
+    <ClCompile Include="Metal.cpp" />
     <ClCompile Include="Typedef.cpp" />
     <ClCompile Include="HittableList.cpp" />
     <ClCompile Include="IHittable.cpp" />
@@ -162,6 +165,7 @@
     <ClCompile Include="Sphere.cpp" />
     <ClCompile Include="Timer.cpp" />
     <ClCompile Include="Vector.cpp" />
+    <ClCompile Include="VectorUtils.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".clang-format" />
@@ -170,6 +174,9 @@
     <ClInclude Include="Assertion.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Config.h" />
+    <ClInclude Include="Lambertian.h" />
+    <ClInclude Include="Material.h" />
+    <ClInclude Include="Metal.h" />
     <ClInclude Include="Typedef.h" />
     <ClInclude Include="HittableList.h" />
     <ClInclude Include="IHittable.h" />
@@ -184,6 +191,7 @@
     <ClInclude Include="Sphere.h" />
     <ClInclude Include="Timer.h" />
     <ClInclude Include="Vector.h" />
+    <ClInclude Include="VectorUtils.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

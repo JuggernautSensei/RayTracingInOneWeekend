@@ -4,5 +4,6 @@
 namespace Details
 {
 
-RandomGeneratorSHR3 g_rngSHR3 { kRandomDeviceSeed };
+thread_local RandomGeneratorSHR3 g_rngSHR3 { kRandomDeviceSeed };
+
 }
