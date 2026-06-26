@@ -3,8 +3,9 @@
 #include "Camera.h"
 #include "HittableList.h"
 #include "Image.h"
+#include "Lambertian.h"
+#include "Metal.h"
 #include "Sphere.h"
-
 
 constexpr std::string_view kOutputDir  = "Outputs";
 constexpr std::string_view kSampleName = "8. Antialiasing";
@@ -19,7 +20,7 @@ void SaveImageBuffer(
 
     fs::path path = kOutputDir;
     path /= filename;
-    _image.SaveToFile(path);
+    _image.SaveToPngFile(path);
 }
 
 int main()
@@ -30,8 +31,16 @@ int main()
 
     // world
     HittableList world = {};
-    world.Add(std::make_unique<Sphere>(Vec3 { 0.f, 0.f, 1.f }, 0.5f));
-    world.Add(std::make_unique<Sphere>(Vec3 { 0.f, -100.5f, 1.f }, 100.f));
+
+    const std::shared_ptr<Material> pGroundMat = std::make_shared<Lambertian>(Vec3 { 0.8f, 0.8f, 0.f });
+    const std::shared_ptr<Material> pCenterMat = std::make_shared<Lambertian>(Vec3 { 0.1f, 0.2f, 0.5f });
+    const std::shared_ptr<Material> pLeftMat   = std::make_shared<Metal>(Vec3 { 0.8f, 0.8f, 0.8f }, 0.3f);
+    const std::shared_ptr<Material> pRightMat  = std::make_shared<Metal>(Vec3 { 0.8f, 0.6f, 0.2f }, 1.f);
+
+    world.Add(std::make_unique<Sphere>(Vec3 { 0.f, -100.5f, 1.f }, 100.f, pGroundMat));
+    world.Add(std::make_unique<Sphere>(Vec3 { 0.f, 0.f, 1.f }, 0.5f, pCenterMat));
+    world.Add(std::make_unique<Sphere>(Vec3 { -1.f, 0.f, 1.f }, 0.5f, pLeftMat));
+    world.Add(std::make_unique<Sphere>(Vec3 { 1.f, 0.f, 1.f }, 0.5f, pRightMat));
 
     // camera
     Camera camera = { kWidth, kHeight };

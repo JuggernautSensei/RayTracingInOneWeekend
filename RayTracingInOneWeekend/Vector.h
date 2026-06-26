@@ -107,6 +107,18 @@ struct Vec3
         return { -x, -y, -z };
     }
 
+    [[nodiscard]] constexpr Vec3 operator*(
+        const Vec3 _other) const
+    {
+        return { x * _other.x, y * _other.y, z * _other.z };
+    }
+
+    [[nodiscard]] constexpr Vec3 operator/(
+        const Vec3 _other) const
+    {
+        return { x / _other.x, y / _other.y, z / _other.z };
+    }
+
     [[nodiscard]] constexpr float Dot(
         const Vec3 _other) const
     {
@@ -179,6 +191,12 @@ struct Vec3
             std::clamp(y, _min.y, _max.y),
             std::clamp(z, _min.z, _max.z)
         };
+    }
+
+    [[nodiscard]] constexpr Vec3 Reflect(
+        const Vec3 _normal) const
+    {
+        return *this - _normal * 2.f * Dot(_normal);
     }
 
     static Vec3 kZero;

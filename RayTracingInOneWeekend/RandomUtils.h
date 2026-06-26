@@ -4,7 +4,7 @@
 namespace Details
 {
 
-extern RandomGeneratorSHR3 g_rngSHR3;
+extern thread_local RandomGeneratorSHR3 g_rngSHR3;
 
 }
 
