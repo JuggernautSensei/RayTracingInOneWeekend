@@ -9,7 +9,7 @@
 #include "Sphere.h"
 
 constexpr std::string_view kOutputDir  = "Outputs";
-constexpr std::string_view kSampleName = "12. Positionable Camera";
+constexpr std::string_view kSampleName = "11. Dielectric";
 
 void SaveImageBuffer(
     const RGBImageBuffer& _image)
@@ -47,9 +47,6 @@ int main()
     // camera
     Camera camera = { kWidth, kHeight };
     camera.SetFOV(ToRad(90.f));
-    camera.SetCenter({ -1.f, 1.f, -0.5f });
-    camera.SetLookAt({ 0.f, 0.f, 1.f });
-    camera.SetCameraUp(Vec3::kUp);
     camera.Render(world);
     SaveImageBuffer(camera.GetImageBuffer());
     return 0;

@@ -63,27 +63,6 @@ void Camera::SetSample(
     m_sample = _sample;
 }
 
-void Camera::SetLookTo(
-    const Vec3 _dir)
-{
-    ASSERT(_dir.IsNormalized(), "Camera look direction must be normalized.");
-    m_lookTo = _dir;
-}
-
-void Camera::SetLookAt(
-    const Vec3 _point)
-{
-    ASSERT(!_point.IsEqualApprox(m_center), "Camera look at point cannot be the same as camera center.");
-    m_lookTo = (_point - m_center).Normalize();
-}
-
-void Camera::SetCameraUp(
-    const Vec3 _up)
-{
-    ASSERT(_up.IsNormalized(), "Camera up direction must be normalized.");
-    m_up = _up;
-}
-
 Int32 Camera::GetWidth() const
 {
     return m_width;
@@ -97,11 +76,6 @@ Int32 Camera::GetHeight() const
 Vec3 Camera::GetCenter() const
 {
     return m_center;
-}
-
-Vec3 Camera::GetLookTo() const
-{
-    return m_lookTo;
 }
 
 float Camera::GetFOV() const
@@ -131,23 +105,23 @@ void Camera::Render(
             Vec3 color = Vec3::kZero;
             if (m_sample == 1)   // non-anti-aliasing
             {
-                const Vec3 pixel  = m_pixelStartPosW
-                                  + m_pixelDx * static_cast<float>(x)
-                                  + m_pixelDy * static_cast<float>(y);
-                const Vec3 origin = (pixel - m_center).Normalize();
-                const Ray  ray    = { m_center, origin };
-                color             = RayColor_(ray, 0, _world);
+                const float yy     = kViewportHeightHalf - (static_cast<float>(y) + 0.5f) * m_pixelH;
+                const float xx     = -viewportWidthHalf + (static_cast<float>(x) + 0.5f) * m_pixelW;
+                const Vec3  pixel  = { xx, yy, m_focalLength };
+                const Vec3  origin = (pixel - m_center).Normalize();
+                const Ray   ray    = { m_center, origin };
+                color              = RayColor_(ray, 0, _world);
             }
             else   // anti-aliasing
             {
                 for (int i = 0; i < m_sample; ++i)
                 {
-                    const Vec3 offset = { GenerateRandomSHR3<float>(0.f, 1.f), GenerateRandomSHR3<float>(0.f, 1.f), 0.f };
-                    const Vec3 pixel  = m_pixelStartPosW
-                                      + m_pixelDx * (static_cast<float>(x) + offset.x)
-                                      + m_pixelDy * (static_cast<float>(y) + offset.y);
-                    const Vec3 origin = (pixel - m_center).Normalize();
-                    const Ray  ray    = { m_center, origin };
+                    const Vec3  offset = { GenerateRandomSHR3<float>(0.f, 1.f), GenerateRandomSHR3<float>(0.f, 1.f), 0.f };
+                    const float xx     = -viewportWidthHalf + (static_cast<float>(x) + offset.x) * m_pixelW;
+                    const float yy     = kViewportHeightHalf - (static_cast<float>(y) + offset.y) * m_pixelH;
+                    const Vec3  pixel  = { xx, yy, m_focalLength };
+                    const Vec3  origin = (pixel - m_center).Normalize();
+                    const Ray   ray    = { m_center, origin };
                     color += RayColor_(ray, 0, _world);
                 }
                 color /= static_cast<float>(m_sample);
@@ -183,27 +157,13 @@ void Camera::UpdateDirty_()
     }
 
     const float aspectRatio = static_cast<float>(m_width) / static_cast<float>(m_height);
-    m_viewportWidth         = kViewportHeight * aspectRatio;
-    m_imageBuffer           = { m_width, m_height };
 
-    ASSERT(m_lookTo.IsEqualApprox(m_up), "Camera look direction and up direction cannot be the same.");
-    ASSERT(m_up.IsNormalized() && m_lookTo.IsNormalized(), "Camera look direction and up direction must be normalized.");
-
-    const Vec3 right = m_up.Cross(m_lookTo).Normalize();
-    const Vec3 up    = m_lookTo.Cross(right).Normalize();
-
-    const float pixelW = m_viewportWidth / static_cast<float>(m_width);
-    const float pixelH = kViewportHeight / static_cast<float>(m_height);
-    m_pixelDx      = right * pixelW;
-    m_pixelDy      = -up * pixelH;
-
-    const float focalLength = kViewportHeight / (2.f * ::tanf(m_fovRad * 0.5f));
-    m_pixelStartPosW        = m_center
-                            + m_lookTo * focalLength
-                            - right * (m_viewportWidth * 0.5f)
-                            + up * kViewportHeightHalf;
-
-    m_bCameraDirty = false;
+    m_viewportWidth = kViewportHeight * aspectRatio;
+    m_pixelW        = m_viewportWidth / static_cast<float>(m_width);
+    m_pixelH        = kViewportHeight / static_cast<float>(m_height);
+    m_focalLength   = kViewportHeight / (2.f * ::tanf(m_fovRad * 0.5f));
+    m_imageBuffer   = { m_width, m_height };
+    m_bCameraDirty  = false;
 }
 
 Vec3 Camera::RayColor_(
