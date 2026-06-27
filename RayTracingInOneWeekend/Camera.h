@@ -14,6 +14,7 @@ public:
     void SetHeight(Int32 _height);
     void SetFOV(float _rad);
     void SetSample(Int32 _sample);
+    void SetMaxDepth(Int32 _depth);
     void SetCenter(Vec3 _center);
     void SetLookTo(Vec3 _dir);
     void SetLookAt(Vec3 _point);
@@ -25,6 +26,7 @@ public:
     [[nodiscard]] Int32 GetHeight() const;
     [[nodiscard]] float GetFOV() const;
     [[nodiscard]] Int32 GetSample() const;
+    [[nodiscard]] Int32 GetMaxDepth() const;
     [[nodiscard]] Vec3  GetCenter() const;
     [[nodiscard]] Vec3  GetLookTo() const;
     [[nodiscard]] Vec3  GetCameraUp() const;

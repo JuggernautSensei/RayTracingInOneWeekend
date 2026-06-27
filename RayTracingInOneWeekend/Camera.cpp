@@ -70,6 +70,12 @@ void Camera::SetSample(
     m_sample = _sample;
 }
 
+void Camera::SetMaxDepth(
+    const Int32 _depth)
+{
+    m_maxDepth = _depth;
+}
+
 void Camera::SetLookTo(
     const Vec3 _dir)
 {
@@ -171,6 +177,11 @@ float Camera::GetFOV() const
 Int32 Camera::GetSample() const
 {
     return m_sample;
+}
+
+Int32 Camera::GetMaxDepth() const
+{
+    return m_maxDepth;
 }
 
 void Camera::Render(
