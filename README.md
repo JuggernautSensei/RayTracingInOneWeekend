@@ -7,7 +7,7 @@ Peter Shirley의 [_Ray Tracing in One Weekend_](https://raytracing.github.io/boo
 ## 결과
 
 > 최종 씬: 500 samples/pixel · 1920×1080 · 피사계 심도 적용 · 렌더링 시간 10분 58.585초 (Release, OpenMP) 
-
+<img width="1920" height="1080" alt="14  Final Scene 2026-06-27 195327" src="https://github.com/user-attachments/assets/a0a5a746-f9ff-407c-b00d-2748a38d96b3" />
 
 ---
 
