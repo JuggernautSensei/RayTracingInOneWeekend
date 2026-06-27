@@ -41,3 +41,22 @@ Vec3 GenerateRandomUnitVec3OnHemisphere(
     const Vec3 vec = GenerateRandomUnitVecOnSphere();
     return vec.Dot(_normal) > 0.f ? vec : -vec;
 }
+
+Vec3 GenerateRandomVec3InDisk()
+{
+    while (true)
+    {
+        Vec3 vec = {
+            GenerateRandomSHR3<float>(-1.f, 1.f),
+            GenerateRandomSHR3<float>(-1.f, 1.f),
+            0.f
+        };
+
+        if (vec.LengthSq() >= 1.f)
+        {
+            continue;
+        }
+
+        return vec;
+    }
+}

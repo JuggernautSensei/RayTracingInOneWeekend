@@ -34,7 +34,7 @@ bool Dielectric::Scatter(
 
     _attenuation    = Vec3::kOne;
     const float eta = _record.bFrontFace ? (1.f / m_ior) : m_ior;
-    const float cos = Min(-_ray.dir.Dot(_record.normal), 1.f);
+    const float cos = -_ray.dir.Dot(_record.normal);
     const float sin = ::sqrtf(1.f - cos * cos);
 
     Vec3 dir = Vec3::kZero;

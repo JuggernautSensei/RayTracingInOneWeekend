@@ -27,8 +27,19 @@ bool Lambertian::Scatter(
     Vec3&            _attenuation,
     Ray&             _scattered) const
 {
-    const Vec3 dir = (_record.normal + GenerateRandomUnitVecOnSphere()).Normalize();
-    _scattered     = { _record.point, dir };
-    _attenuation   = m_albedo;
+    const Vec3 sample = GenerateRandomUnitVecOnSphere();
+    Vec3       dir    = _record.normal + sample;
+    if (dir.IsZeroApprox())
+    {
+        _scattered = { _record.point, _record.normal };
+    }
+    else
+    {
+        const float lenSq = dir.LengthSq();
+        dir /= ::sqrtf(lenSq);
+        _scattered = { _record.point, dir };
+    }
+
+    _attenuation = m_albedo;
     return true;
 }

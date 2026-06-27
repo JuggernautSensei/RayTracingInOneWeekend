@@ -78,7 +78,7 @@ bool Sphere::Hit(
 
     _record.t          = t;
     _record.point      = _ray.At(t);
-    _record.normal     = (_record.point - m_center) / m_radius;
+    _record.normal     = (_record.point - m_center).Normalize();
     _record.bFrontFace = true;
     _record.pMaterial  = m_pMaterial.get();
 

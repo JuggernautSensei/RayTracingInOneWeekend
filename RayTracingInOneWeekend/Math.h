@@ -5,7 +5,7 @@ constexpr float k2PI     = 2.f * kPI;
 constexpr float kInvPI   = 0.5f * kPI;
 constexpr float kDeg2Rad = kPI / 180.f;
 constexpr float kRad2Deg = 180.f / kPI;
-constexpr float kEpsilon = 1e-6f;
+constexpr float kEpsilon = 1e-4f;
 
 template<typename T>
 struct Limits
