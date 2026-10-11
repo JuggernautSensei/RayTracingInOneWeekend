@@ -2,7 +2,7 @@
 
 # Ray Tracing In One Weekend
 
-**C++20으로 직접 구현한 CPU 패스 트레이서**
+**C++20으로 직접 구현한 CPU 레이 트레이서**
 
 ![C++20](https://img.shields.io/badge/C%2B%2B-20-00599C?logo=cplusplus&logoColor=white)
 ![Windows](https://img.shields.io/badge/Platform-Windows-0078D4?logo=windows&logoColor=white)
