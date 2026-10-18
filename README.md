@@ -1,28 +1,197 @@
+<div align="center">
+
 # Ray Tracing in One Weekend
 
-![최종 씬](RayTracingInOneWeekend/Outputs/14.%20Final%20Scene%202026-06-27%20195327.png)
+**책의 설명만 보고 직접 설계한 C++ 레이 트레이서**
 
-*최종 씬 렌더 결과입니다. 1920×1080 해상도, 픽셀당 500샘플, 최대 반사 깊이 50으로 렌더링했습니다.*
+![C++20](https://img.shields.io/badge/C%2B%2B-20-00599C?logo=cplusplus&logoColor=white)
+![Windows](https://img.shields.io/badge/Platform-Windows-0078D4)
+![OpenMP](https://img.shields.io/badge/OpenMP-Parallel-4D4D4D)
 
-[Ray Tracing in One Weekend](https://raytracing.github.io/books/RayTracingInOneWeekend.html)를 따라 만든 C++ 레이 트레이서입니다. 책에 실린 코드는 사용하지 않았습니다. 각 장의 설명만 읽고 클래스 구성과 구현 코드는 모두 직접 설계하고 작성했습니다.
+<p align="center"><img src="RayTracingInOneWeekend/Outputs/14.%20Final%20Scene%202026-06-27%20195327.png" alt="회색 바닥 위에 색색의 작은 구와 유리·확산·금속 재질의 큰 구 세 개가 놓인 최종 씬" width="840"></p>
+
+*1920×1080, 픽셀당 500샘플, 최대 반사 깊이 50으로 렌더링한 최종 씬*
+
+</div>
 
 ## Contents
 
-- [구현 범위](#구현-범위)
+- [프로젝트 소개](#프로젝트-소개)
+- [광선과 교차](#광선과-교차)
+- [재질](#재질)
+- [카메라](#카메라)
+- [최종 씬](#최종-씬)
 - [코드 구조](#코드-구조)
-- [챕터별 학습](#챕터별-학습)
 
-## 구현 범위
+<br>
+
+## 프로젝트 소개
+
+[Ray Tracing in One Weekend](https://raytracing.github.io/books/RayTracingInOneWeekend.html)를 따라 만든 C++ 레이 트레이서입니다. 책에 실린 코드는 사용하지 않았습니다. 각 장의 설명만 읽고 클래스 구성과 구현 코드는 모두 직접 설계하고 작성했습니다.
+
+구현한 기능은 다음과 같습니다.
 
 - 카메라에서 픽셀마다 광선을 쏘고, 아무것도 맞지 않으면 하늘 배경색을 반환
-- 광선과 구의 교차 판정
-- 표면 법선 계산, 앞면/뒷면 구분, 여러 오브젝트 중 가장 가까운 교차 선택
+- 광선과 구의 교차 판정, 표면 법선과 앞면/뒷면 구분
 - 픽셀 내 무작위 샘플링을 이용한 안티에일리어싱
-- 확산(Lambertian), 금속(Metal), 유리(Dielectric) 재질
-- 감마 보정
-- 시야각, 위치, 바라보는 지점을 지정할 수 있는 카메라
-- 디포커스 블러(피사계 심도)
+- 확산(Lambertian), 금속(Metal), 유리(Dielectric) 재질과 감마 보정
+- 시야각, 위치, 바라보는 지점을 지정할 수 있는 카메라와 디포커스 블러
 - 렌더링 결과 PNG 저장
+
+<br>
+
+## 광선과 교차
+
+### 광선과 배경
+
+광선은 시작점과 방향으로 정의합니다. 카메라는 뷰포트의 각 픽셀을 향해 광선을 쏘고, 광선이 아무것도 맞지 않으면 방향의 y 성분에 따라 흰색과 하늘색을 보간해 배경을 그립니다.
+
+```cpp
+constexpr Vec3 kWhite { 1.f };
+constexpr Vec3 kSky = { 0.5f, 0.7f, 1.f };
+const float    a    = 0.5f * (_ray.dir.y + 1.f);
+return kWhite.Lerp(kSky, a);
+```
+
+### 구 교차
+
+광선 위의 점이 구 표면에 놓이는 조건을 `t`에 대한 이차방정식으로 정리하고, 판별식이 음수이면 교차하지 않는다고 판단합니다. 근이 있으면 가까운 근부터 유효 범위 안에 있는지 확인하고, 벗어나면 먼 근을 확인합니다.
+
+```cpp
+const Vec3  u  = _ray.origin - m_center;
+const float vu = _ray.dir.Dot(u);
+const float a  = _ray.dir.LengthSq();
+const float c  = u.LengthSq() - m_radius * m_radius;
+const float d  = vu * vu - a * c;   // 판별식
+```
+
+### 여러 오브젝트와 앞뒷면
+
+교차 지점의 법선이 광선과 같은 쪽을 향하면 광선이 구 안쪽에서 나가는 경우로 보고, 법선을 뒤집어 `bFrontFace`를 `false`로 기록합니다. 여러 오브젝트를 순회할 때는 교차할 때마다 탐색 범위의 최댓값을 줄여 가장 가까운 교차만 남깁니다.
+
+```cpp
+for (const std::unique_ptr<IHittable>& pHittable: m_hittables)
+{
+    if (pHittable->Hit(_ray, _interval, _outRecord))
+    {
+        bAnyHit       = true;
+        _interval.max = _outRecord.t;   // 가장 가까운 hit만 기록
+    }
+}
+```
+
+<br>
+
+## 재질
+
+교차가 일어나면 재질의 `Scatter`가 감쇠 색과 산란된 광선을 정하고, `Camera::RayColor_`가 산란 광선을 최대 깊이까지 재귀적으로 추적합니다. 자기 자신과 다시 교차하는 문제를 피하려고 `t`의 최솟값은 0.001로 둡니다.
+
+### 확산
+
+법선에 무작위 단위 벡터를 더한 방향으로 광선을 산란시켜 Lambertian 반사를 표현합니다. 더한 결과가 0에 가까우면 법선 방향을 사용합니다.
+
+```cpp
+const Vec3 sample = GenerateRandomUnitVecOnSphere();
+Vec3       dir    = _record.normal + sample;
+if (dir.IsZeroApprox())
+{
+    _scattered = { _record.point, _record.normal };
+}
+```
+
+### 금속
+
+입사 광선을 법선 기준으로 반사시키고, fuzz 크기만큼 무작위 벡터를 더해 거친 표면을 표현합니다. 반사 방향이 표면 안쪽을 향하면 광선을 흡수합니다.
+
+```cpp
+const Vec3 reflected = (_ray.dir.Reflect(_record.normal) + GenerateRandomUnitVecOnSphere() * m_fuzz).Normalize();
+_scattered           = { _record.point, reflected };
+_attenuation         = m_albedo;
+return reflected.Dot(_record.normal) > 0.f;
+```
+
+### 유리
+
+굴절률 비율로 스넬의 법칙에 따른 굴절 방향을 계산합니다. 굴절이 불가능한 전반사 조건이거나, Schlick 근사로 구한 반사율이 난수보다 크면 반사시킵니다.
+
+```cpp
+const float eta = _record.bFrontFace ? (1.f / m_ior) : m_ior;
+const float cos = -_ray.dir.Dot(_record.normal);
+const float sin = ::sqrtf(1.f - cos * cos);
+
+if (eta * sin > 1.f || Reflectance(cos, eta) > GenerateRandomSHR3<float>(0.f, 1.f))
+```
+
+### 감마 보정
+
+샘플을 평균낸 선형 색에 감마 2의 보정을 적용한 뒤 이미지 버퍼에 기록합니다.
+
+```cpp
+color /= static_cast<float>(m_sample);
+m_imageBuffer.WriteLinear(x, y, GammaCorrect(color, 2.f));
+```
+
+<br>
+
+## 카메라
+
+### 안티에일리어싱
+
+픽셀 하나에 여러 광선을 쏘되, 광선마다 픽셀 안의 위치를 무작위로 흔들고 결과 색을 평균내 경계의 계단 현상을 줄입니다. 샘플이 1개일 때는 픽셀 중앙을 사용합니다.
+
+```cpp
+const float xOffset = m_sample == 1 ? 0.5f : GenerateRandomSHR3<float>(0.f, 1.f);
+const float yOffset = m_sample == 1 ? 0.5f : GenerateRandomSHR3<float>(0.f, 1.f);
+```
+
+### 위치 지정
+
+수직 시야각과 초점 거리로 뷰포트 크기를 정하고, 바라보는 방향과 위쪽 벡터로 카메라의 오른쪽·위쪽 기저를 계산합니다. setter는 값이 바뀔 때만 dirty 플래그를 세우고, 이 계산은 렌더링 직전에 `UpdateDirty_`에서 한 번만 수행합니다.
+
+```cpp
+m_viewportHeight        = 2 * ::tanf(m_fovRad * 0.5f) * m_focusDist;
+m_viewportWidth         = m_viewportHeight * aspectRatio;
+
+const Vec3 right = m_up.Cross(m_lookTo).Normalize();
+const Vec3 up    = m_lookTo.Cross(right).Normalize();
+```
+
+### 디포커스 블러
+
+광선의 시작점을 카메라 중심 대신 렌즈 원판 위의 무작위 점으로 바꿔 초점면에서 벗어난 물체가 흐려지게 합니다. 렌즈 반지름은 디포커스 각도와 초점 거리로 정합니다.
+
+```cpp
+const Vec3 sample = GenerateRandomVec3InDisk();
+return m_center + m_defocusDiskRight * sample.x + m_defocusDiskUp * sample.y;
+```
+
+<br>
+
+## 최종 씬
+
+격자 위에 반지름 0.2의 작은 구를 무작위로 배치하고, 확산 80%, 금속 15%, 유리 5%의 비율로 재질을 정했습니다. 가운데에는 유리, 확산, 금속 재질의 큰 구 세 개를 두었습니다.
+
+```cpp
+if (materialSelector < 0.8f)
+{
+    // diffuse
+    ...
+}
+else if (materialSelector < 0.95f)
+{
+    // metal
+    ...
+}
+else
+{
+    // glass
+    pMaterial = std::make_shared<Dielectric>(1.5f);
+}
+```
+
+카메라는 시야각 20°, 디포커스 각도 0.6°, 초점 거리 10으로 설정했습니다.
+
+<br>
 
 ## 코드 구조
 
@@ -36,88 +205,3 @@
 | `Image` | RGB 이미지 버퍼와 PNG 저장 |
 | `Profile`, `Timer`, `Assertion` | 함수 단위 시간 측정, 타이머, 어서션 |
 | `Main` | 최종 씬 구성과 카메라 설정 |
-
-## 챕터별 학습
-
-### 이미지 출력과 벡터 (2~3장)
-
-렌더링 결과를 픽셀 단위로 기록할 이미지와, 위치·방향·색을 함께 표현할 3차원 벡터를 먼저 만들었습니다. 책은 PPM 형식으로 출력하지만, 이 프로젝트는 stb_image_write로 PNG 파일을 저장합니다.
-
-- `RGBImageBuffer::WriteLinear`, `RGBImageBuffer::SaveToPngFile`
-- `Vec3`
-
-### 광선, 카메라, 배경 (4장)
-
-광선을 시작점과 방향으로 정의하고, 카메라 위치에서 뷰포트의 각 픽셀을 향해 광선을 쏘았습니다. 광선이 아무것도 맞지 않으면 방향의 y 성분에 따라 흰색과 하늘색을 보간해 배경을 그립니다.
-
-- `Ray`
-- `Camera::RayColor_`의 배경 보간
-
-### 구 추가 (5장)
-
-광선 위의 점이 구 표면에 놓이는 조건을 `t`에 대한 이차방정식으로 정리하고, 판별식으로 교차 여부를 판단했습니다.
-
-- `Sphere::Hit`
-
-### 표면 법선과 여러 오브젝트 (6장)
-
-교차 지점의 법선을 구하고, 광선이 구의 바깥에서 들어왔는지 안에서 나가는지를 구분해 법선이 항상 광선과 반대쪽을 향하도록 했습니다. 여러 오브젝트를 순회할 때는 교차할 때마다 탐색 범위의 최댓값을 줄여 가장 가까운 교차만 남깁니다.
-
-- `HitRecord`의 `bFrontFace`
-- `HittableList::Hit`
-- `Interval`
-
-### 카메라 클래스 분리 (7장)
-
-뷰포트 계산과 렌더링 루프를 `Camera` 클래스로 옮겼습니다. 설정값은 setter로 바꾸며, 값이 바뀌면 dirty 플래그를 세우고 렌더링 직전에 뷰포트 관련 값을 한 번만 다시 계산합니다.
-
-- `Camera`의 setter
-- `Camera::UpdateDirty_`, `Camera::Render`
-
-### 안티에일리어싱 (8장)
-
-픽셀 하나에 여러 광선을 쏘되, 광선마다 픽셀 안의 위치를 무작위로 흔들고 결과 색을 평균내 경계의 계단 현상을 줄였습니다. 샘플이 1개일 때는 픽셀 중앙을 사용합니다.
-
-- `Camera::CalcRay_`
-- `Camera::Render`의 샘플 평균
-
-### 확산 재질 (9장)
-
-교차 지점에서 법선에 무작위 단위 벡터를 더한 방향으로 광선을 다시 산란시켜 Lambertian 반사를 구현했습니다. 산란 방향이 0에 가까우면 법선 방향을 사용합니다. 자기 자신과 다시 교차하는 문제를 피하려고 `t`의 최솟값을 0.001로 두었고, 결과 색에는 감마 2의 보정을 적용합니다.
-
-- `Lambertian::Scatter`
-- `GenerateRandomUnitVecOnSphere`, `GammaCorrect`
-
-### 금속 (10장)
-
-입사 광선을 법선 기준으로 반사시키고, 반사 방향에 fuzz 크기만큼 무작위 벡터를 더해 거친 금속을 표현했습니다. 반사 방향이 표면 안쪽을 향하면 광선을 흡수합니다.
-
-- `Metal::Scatter`
-- `Vec3::Reflect`
-
-### 유리 (11장)
-
-굴절률 비율로 스넬의 법칙에 따른 굴절 방향을 계산했습니다. 굴절이 불가능한 전반사 조건이거나, Schlick 근사로 구한 반사율이 난수보다 크면 반사시킵니다. 이 장의 구현은 12장 커밋에 함께 포함되어 있습니다.
-
-- `Dielectric::Scatter`
-- `Vec3::Refract`
-
-### 위치 지정 카메라 (12장)
-
-수직 시야각으로 뷰포트 크기를 정하고, 카메라 위치·바라보는 지점·위쪽 벡터로 카메라의 오른쪽·위쪽 기저를 계산해 원하는 위치와 방향에서 장면을 볼 수 있게 했습니다.
-
-- `Camera::SetFOV`, `Camera::SetCenter`, `Camera::SetLookAt`, `Camera::SetCameraUp`
-- `Camera::UpdateDirty_`
-
-### 디포커스 블러 (13장)
-
-광선의 시작점을 카메라 중심 대신 렌즈 원판 위의 무작위 점으로 바꾸고, 뷰포트를 초점 거리에 두어 초점면에서 벗어난 물체가 흐려지게 했습니다. 렌즈 크기는 디포커스 각도와 초점 거리로 정합니다.
-
-- `Camera::GenerateDefocusDiskSample_`, `GenerateRandomVec3InDisk`
-- `Camera::SetDefocusRad`, `Camera::SetFocusDistance`
-
-### 최종 씬 (14장)
-
-격자 위에 작은 구를 무작위로 배치하고, 확산 80%, 금속 15%, 유리 5%의 비율로 재질을 정했습니다. 가운데에는 유리, 확산, 금속 재질의 큰 구 세 개를 두었습니다. 카메라는 시야각 20°, 디포커스 각도 0.6°, 초점 거리 10으로 설정했습니다.
-
-- `main`
