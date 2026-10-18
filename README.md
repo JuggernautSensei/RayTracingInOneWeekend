@@ -2,7 +2,7 @@
 
 # Ray Tracing in One Weekend
 
-**책의 설명만 보고 직접 설계한 C++ 레이 트레이서**
+**C++ 소프트웨어 레이 트레이서**
 
 ![C++20](https://img.shields.io/badge/C%2B%2B-20-00599C?logo=cplusplus&logoColor=white)
 ![Windows](https://img.shields.io/badge/Platform-Windows-0078D4)
