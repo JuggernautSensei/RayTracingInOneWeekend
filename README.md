@@ -27,7 +27,7 @@
 
 ## 프로젝트 소개
 
-[Ray Tracing in One Weekend](https://raytracing.github.io/books/RayTracingInOneWeekend.html)를 따라 만든 C++ 레이 트레이서입니다. 책에 실린 코드는 사용하지 않았습니다. 각 장의 설명만 읽고 클래스 구성과 구현 코드는 모두 직접 설계하고 작성했습니다.
+[Ray Tracing in One Weekend](https://raytracing.github.io/books/RayTracingInOneWeekend.html)의 내용을 바탕으로 클래스 구성과 코드를 직접 설계해 구현한 C++ 레이 트레이서입니다.
 
 구현한 기능은 다음과 같습니다.
 
