@@ -6,6 +6,7 @@
 
 </div>
 
+<p align="center">
 *반사와 굴절, 확산 반사, 초점에 따른 흐림을 함께 적용한 최종 씬입니다.*
 
 [Ray Tracing in One Weekend](https://raytracing.github.io/books/RayTracingInOneWeekend.html)를 학습하며 구현한 C++ 소프트웨어 레이 트레이서입니다. 카메라에서 보낸 광선이 물체에 닿고 다시 산란하는 경로를 CPU에서 계산해, 결과를 PNG 이미지로 저장합니다.
