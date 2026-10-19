@@ -17,9 +17,6 @@
 - [금속과 유리](#금속과-유리)
 - [카메라와 초점](#카메라와-초점)
 - [최종 씬](#최종-씬)
-- [코드 구조](#코드-구조)
-- [빌드 및 실행](#빌드-및-실행)
-- [구현 범위와 참고](#구현-범위와-참고)
 
 ## 광선과 배경
 
@@ -36,15 +33,13 @@ return origin + dir * _t;
 
 *물체와의 교차 계산 없이 광선 방향만으로 만든 배경입니다.*
 
-광선의 표현은 [`Ray.h`](https://github.com/JuggernautSensei/RayTracingInOneWeekend/blob/main/RayTracingInOneWeekend/Ray.h), 픽셀에서 광선을 만드는 계산과 배경색 처리는 [`Camera.cpp`](https://github.com/JuggernautSensei/RayTracingInOneWeekend/blob/main/RayTracingInOneWeekend/Camera.cpp)에 있습니다.
-
 ## 구와 표면 법선
 
 ### 구 교차
 
 배경 위에 구를 놓으려면 광선이 구의 표면을 통과하는지 판단해야 합니다. 광선 위의 점과 구 중심 사이의 거리가 반지름과 같아지는 조건을 정리하면, 거리 매개변수 `t`에 대한 이차방정식이 됩니다. 판별식이 음수이면 구를 지나지 않고, 근이 있으면 광선이 구의 표면을 만나는 위치를 구할 수 있습니다.
 
-[`Sphere::Hit()`](https://github.com/JuggernautSensei/RayTracingInOneWeekend/blob/main/RayTracingInOneWeekend/Sphere.cpp)은 가까운 근부터 검사합니다. 가까운 근이 허용된 범위 밖이면 먼 근을 확인하고, 둘 다 범위 밖이면 교차하지 않은 것으로 처리합니다. 단순히 방정식의 근이 있다는 것과 카메라 앞의 유효한 표면을 찾았다는 것은 이 범위 검사로 구분됩니다.
+`Sphere::Hit()`는 가까운 근부터 검사합니다. 가까운 근이 허용된 범위 밖이면 먼 근을 확인하고, 둘 다 범위 밖이면 교차하지 않은 것으로 처리합니다. 단순히 방정식의 근이 있다는 것과 카메라 앞의 유효한 표면을 찾았다는 것은 이 범위 검사로 구분됩니다.
 
 <p align="center"><img src="docs/images/sphere.png" alt="하늘 배경 가운데에 광선과의 교차 여부만으로 그린 빨간 구" width="640"></p>
 
@@ -58,7 +53,7 @@ return origin + dir * _t;
 
 *색의 변화는 조명이 아니라 표면 방향을 나타냅니다. 아래쪽 바닥도 반지름이 큰 구의 일부입니다.*
 
-물체가 여러 개이면 광선이 만나는 표면 중 가장 가까운 것을 선택해야 합니다. [`HittableList::Hit()`](https://github.com/JuggernautSensei/RayTracingInOneWeekend/blob/main/RayTracingInOneWeekend/HittableList.cpp)은 목록을 순회하면서 교차가 발견될 때마다 다음 탐색의 최대 거리를 줄입니다. 뒤의 물체가 앞의 물체를 덮어쓰지 않도록, 지금까지 발견한 표면보다 가까운 교차만 남기는 방식입니다.
+물체가 여러 개이면 광선이 만나는 표면 중 가장 가까운 것을 선택해야 합니다. `HittableList::Hit()`는 목록을 순회하면서 교차가 발견될 때마다 다음 탐색의 최대 거리를 줄입니다. 뒤의 물체가 앞의 물체를 덮어쓰지 않도록, 지금까지 발견한 표면보다 가까운 교차만 남기는 방식입니다.
 
 ```cpp
 if (pHittable->Hit(_ray, _interval, _outRecord))
@@ -94,9 +89,9 @@ const float yOffset = m_sample == 1 ? 0.5f : GenerateRandomSHR3<float>(0.f, 1.f)
 
 법선을 색으로 표시하면 구의 모양은 보이지만, 표면이 어떤 재질인지에 따른 색과 음영은 아직 없습니다. 확산 재질에서는 광선이 표면에 닿았을 때 한 방향으로만 반사되지 않고 여러 방향으로 퍼져 나간다고 보고, 그중 한 방향을 무작위로 선택해 다음 광선을 추적했습니다.
 
-[`Lambertian::Scatter()`](https://github.com/JuggernautSensei/RayTracingInOneWeekend/blob/main/RayTracingInOneWeekend/Lambertian.cpp)은 표면 법선에 구면 위의 무작위 단위 벡터를 더해 산란 방향을 만듭니다. 이렇게 하면 법선에 가까운 방향이 더 자주 선택됩니다. 더한 벡터가 거의 0이면 법선 방향을 사용하고, 그 외에는 정규화한 방향으로 교차 지점에서 새 광선을 보냅니다.
+`Lambertian::Scatter()`는 표면 법선에 구면 위의 무작위 단위 벡터를 더해 산란 방향을 만듭니다. 이렇게 하면 법선에 가까운 방향이 더 자주 선택됩니다. 더한 벡터가 거의 0이면 법선 방향을 사용하고, 그 외에는 정규화한 방향으로 교차 지점에서 새 광선을 보냅니다.
 
-새 광선은 다른 물체에 닿을 수도 있고 배경으로 빠져나갈 수도 있습니다. [`Camera::RayColor_()`](https://github.com/JuggernautSensei/RayTracingInOneWeekend/blob/main/RayTracingInOneWeekend/Camera.cpp)은 같은 계산을 재귀적으로 호출해 다음 광선의 색을 구하고, 현재 표면의 감쇠 색을 곱해 돌려줍니다. 감쇠 색인 `albedo`는 표면에서 반사되는 색 성분을 정합니다. 예를 들어 파란 재질은 경로를 따라 돌아오는 색의 빨강과 초록 성분을 상대적으로 줄입니다.
+새 광선은 다른 물체에 닿을 수도 있고 배경으로 빠져나갈 수도 있습니다. `Camera::RayColor_()`는 같은 계산을 재귀적으로 호출해 다음 광선의 색을 구하고, 현재 표면의 감쇠 색을 곱해 돌려줍니다. 감쇠 색인 `albedo`는 표면에서 반사되는 색 성분을 정합니다. 예를 들어 파란 재질은 경로를 따라 돌아오는 색의 빨강과 초록 성분을 상대적으로 줄입니다.
 
 ```cpp
 // 현재 재질이 다음 광선과 감쇠 색을 정하고, 다음 경로의 색을 재귀적으로 계산
@@ -129,15 +124,15 @@ color /= static_cast<float>(m_sample);
 m_imageBuffer.WriteLinear(x, y, GammaCorrect(color, 2.f));
 ```
 
-감마 계산은 [`VectorUtils.cpp`](https://github.com/JuggernautSensei/RayTracingInOneWeekend/blob/main/RayTracingInOneWeekend/VectorUtils.cpp), RGB 범위 제한과 PNG 저장은 [`Image.cpp`](https://github.com/JuggernautSensei/RayTracingInOneWeekend/blob/main/RayTracingInOneWeekend/Image.cpp)에 있습니다. 감마 보정은 새로운 광선이나 음영을 만드는 단계가 아니라, 계산한 색을 이미지에 기록하기 전의 변환입니다.
+감마 보정은 새로운 광선이나 음영을 만드는 단계가 아니라, 계산한 색을 이미지에 기록하기 전의 변환입니다.
 
 ## 금속과 유리
 
 ### 금속 반사
 
-확산 재질과 달리 매끄러운 금속은 입사 방향과 법선으로 반사 방향을 정합니다. [`Vec3::Reflect()`](https://github.com/JuggernautSensei/RayTracingInOneWeekend/blob/main/RayTracingInOneWeekend/Vector.h)은 입사 벡터에서 법선 방향 성분의 두 배를 빼 반사 벡터를 구합니다. 다음 광선은 이 방향으로 이동하므로 주변 물체와 배경이 금속 표면에 비칩니다.
+확산 재질과 달리 매끄러운 금속은 입사 방향과 법선으로 반사 방향을 정합니다. `Vec3::Reflect()`은 입사 벡터에서 법선 방향 성분의 두 배를 빼 반사 벡터를 구합니다. 다음 광선은 이 방향으로 이동하므로 주변 물체와 배경이 금속 표면에 비칩니다.
 
-[`Metal::Scatter()`](https://github.com/JuggernautSensei/RayTracingInOneWeekend/blob/main/RayTracingInOneWeekend/Metal.cpp)에서는 반사 방향에 무작위 벡터를 더하고, 그 크기를 `fuzz`로 조절했습니다. `fuzz`가 0이면 정해진 방향으로 반사하고, 값이 커지면 반사 방향이 퍼져 거친 표면처럼 보입니다. 계산된 방향이 표면 안쪽을 향하는 경우에는 산란을 거절해 해당 경로를 흡수합니다.
+`Metal::Scatter()`에서는 반사 방향에 무작위 벡터를 더하고, 그 크기를 `fuzz`로 조절했습니다. `fuzz`가 0이면 정해진 방향으로 반사하고, 값이 커지면 반사 방향이 퍼져 거친 표면처럼 보입니다. 계산된 방향이 표면 안쪽을 향하는 경우에는 산란을 거절해 해당 경로를 흡수합니다.
 
 ```cpp
 const Vec3 reflected = (_ray.dir.Reflect(_record.normal)
@@ -153,7 +148,7 @@ return reflected.Dot(_record.normal) > 0.f;
 
 ### 유리의 반사와 굴절
 
-유리는 표면에서 반사되는 경로와 내부로 꺾여 들어가는 굴절 경로를 함께 다룹니다. [`Dielectric::Scatter()`](https://github.com/JuggernautSensei/RayTracingInOneWeekend/blob/main/RayTracingInOneWeekend/Dielectric.cpp)은 `bFrontFace`로 광선이 바깥에서 들어오는지 안에서 나가는지 구분하고, 그에 맞춰 굴절률 비율 `eta`를 정합니다. 같은 유리라도 두 매질을 통과하는 순서에 따라 굴절 계산에 사용하는 비율이 반대가 되기 때문입니다.
+유리는 표면에서 반사되는 경로와 내부로 꺾여 들어가는 굴절 경로를 함께 다룹니다. `Dielectric::Scatter()`는 `bFrontFace`로 광선이 바깥에서 들어오는지 안에서 나가는지 구분하고, 그에 맞춰 굴절률 비율 `eta`를 정합니다. 같은 유리라도 두 매질을 통과하는 순서에 따라 굴절 계산에 사용하는 비율이 반대가 되기 때문입니다.
 
 굴절률과 입사각에 따라 굴절이 불가능한 전반사 조건이 되면 반사시킵니다. 굴절이 가능할 때도 항상 투과시키지는 않고, Schlick 근사로 계산한 반사율과 난수를 비교해 반사 또는 굴절 중 한 경로를 선택합니다. 여러 샘플을 모으면서 두 경로의 기여가 이미지에 함께 반영됩니다.
 
@@ -204,13 +199,13 @@ return m_center + m_defocusDiskRight * sample.x + m_defocusDiskUp * sample.y;
 
 *카메라와 초점 설정을 적용한 중간 결과입니다. 물체의 거리에 따라 선명도가 달라지고, 초점에서 벗어난 윤곽이 흐려집니다.*
 
-초점 거리와 디포커스 각도는 함께 렌즈 반지름을 결정합니다. 이 카메라에서는 초점 거리가 뷰포트 크기 계산에도 사용되며, 초점 거리를 바꿀 때 시야각은 유지됩니다. 관련 계산은 모두 [`Camera.cpp`](https://github.com/JuggernautSensei/RayTracingInOneWeekend/blob/main/RayTracingInOneWeekend/Camera.cpp)에 있습니다.
+초점 거리와 디포커스 각도는 함께 렌즈 반지름을 결정합니다. 이 카메라에서는 초점 거리가 뷰포트 크기 계산에도 사용되며, 초점 거리를 바꿀 때 시야각은 유지됩니다.
 
 ## 최종 씬
 
 제목 아래의 최종 이미지는 큰 바닥 구 위에 작은 구를 여러 개 놓고, 확산·금속·유리 재질과 디포커스 블러를 함께 적용한 결과입니다. 앞에서 각각 확인한 교차와 산란, 샘플링, 카메라 계산이 한 장면에 결합됩니다.
 
-현재 [`Main.cpp`](https://github.com/JuggernautSensei/RayTracingInOneWeekend/blob/main/RayTracingInOneWeekend/Main.cpp)는 22×22 격자를 후보 위치로 사용하고, 각 칸 안에서 위치를 조금씩 무작위로 옮겨 반지름 0.2인 작은 구를 배치합니다. 큰 구 주변의 일부 후보는 제외합니다. 작은 구의 재질은 확산 80%, 금속 15%, 유리 5%의 확률로 선택하며, 이는 실제 구 개수의 비율을 고정한다는 뜻은 아닙니다.
+최종 장면은 22×22 격자를 후보 위치로 사용하고, 각 칸 안에서 위치를 조금씩 무작위로 옮겨 반지름 0.2인 작은 구를 배치합니다. 큰 구 주변의 일부 후보는 제외합니다. 작은 구의 재질은 확산 80%, 금속 15%, 유리 5%의 확률로 선택하며, 이는 실제 구 개수의 비율을 고정한다는 뜻은 아닙니다.
 
 큰 구 세 개에는 각각 유리, 갈색 확산 재질, 거칠기가 0인 금속을 지정했습니다. 바닥은 회색 확산 재질입니다. 같은 형태의 구라도 산란 규칙을 바꾸면 전혀 다른 표면으로 보인다는 것을 한 장면에서 확인할 수 있습니다.
 
@@ -228,82 +223,3 @@ return m_center + m_defocusDiskRight * sample.x + m_defocusDiskUp * sample.y;
 | 초점 거리 | 10 |
 
 배치와 샘플링에는 난수를 사용하므로 실행마다 구의 위치·재질과 미세한 잡음은 달라질 수 있습니다. 해상도와 샘플 수를 낮추면 전체 계산량을 줄여 구도와 재질을 먼저 확인할 수 있습니다.
-
-## 코드 구조
-
-장면을 만드는 진입점은 `Main.cpp`입니다. 물체와 재질을 구성하고 카메라를 설정한 뒤 `Render()`를 호출합니다. 카메라가 각 픽셀의 광선을 만들면 물체 목록이 교차를 찾고, 교차한 표면의 재질이 다음 광선을 정합니다. 이 계산을 반복해 얻은 픽셀 색이 이미지 버퍼로 들어갑니다.
-
-| 구성 | 역할 |
-|---|---|
-| [`Camera`](https://github.com/JuggernautSensei/RayTracingInOneWeekend/blob/main/RayTracingInOneWeekend/Camera.h) | 카메라 설정, 픽셀 샘플링, 광선 생성, 재귀 색 계산 |
-| [`IHittable`·`HitRecord`](https://github.com/JuggernautSensei/RayTracingInOneWeekend/blob/main/RayTracingInOneWeekend/IHittable.h) | 공통 교차 인터페이스와 표면 교차 정보 |
-| [`Sphere`](https://github.com/JuggernautSensei/RayTracingInOneWeekend/blob/main/RayTracingInOneWeekend/Sphere.h) | 구 교차와 법선 계산, 재질 보관 |
-| [`HittableList`](https://github.com/JuggernautSensei/RayTracingInOneWeekend/blob/main/RayTracingInOneWeekend/HittableList.h) | 물체 목록 소유와 가장 가까운 교차 탐색 |
-| [`Material`](https://github.com/JuggernautSensei/RayTracingInOneWeekend/blob/main/RayTracingInOneWeekend/Material.h)과 세 재질 | 산란 광선과 감쇠 색 결정 |
-| [`RGBImageBuffer`](https://github.com/JuggernautSensei/RayTracingInOneWeekend/blob/main/RayTracingInOneWeekend/Image.h) | RGB 바이트 버퍼와 PNG 저장 |
-
-물체 목록은 `unique_ptr<IHittable>`로 각 물체를 소유하고, 구는 `shared_ptr<Material>`로 재질을 보관합니다. `HitRecord`의 재질 포인터는 교차한 표면의 재질을 참조하며 소유권을 갖지 않습니다. 교차를 찾는 부분은 재질의 구체적인 종류를 몰라도 되고, 재질은 자신에게 전달된 교차 정보로 다음 산란을 계산합니다.
-
-렌더링은 OpenMP의 `parallel for schedule(dynamic)`으로 이미지의 행을 나누어 처리합니다. 각 작업은 자신이 맡은 픽셀을 기록하고, 난수 생성기는 스레드별로 사용합니다. 완료된 행 수는 원자 변수로 세며 진행률 출력은 임계 구역에서 수행합니다. 여기서는 병렬화의 적용 방식만 설명하며, 실행 시간이나 속도 향상 배율을 제시하지 않습니다.
-
-## 빌드 및 실행
-
-### 준비
-
-Windows에서 Visual Studio의 C++ 데스크톱 개발 도구와 Windows SDK가 필요합니다. 현재 프로젝트는 플랫폼 도구 집합 `v145`, Windows SDK `10.0`을 지정하며, `x64` 구성에 C++20과 OpenMP가 설정되어 있습니다.
-
-PNG 저장에 사용하는 [`stb_image_write.h`](https://github.com/nothings/stb/blob/2c980bb59875b0d32144a71867fbdebb2f77cd20/stb_image_write.h)는 저장소에 포함되어 있지 않습니다. 링크는 빌드 확인에 사용한 버전입니다. 헤더를 별도로 준비한 뒤, 프로젝트 속성에서 구성은 **모든 구성**, 플랫폼은 **x64**로 선택하고 다음을 설정합니다.
-
-- **C/C++ → 일반 → 추가 포함 디렉터리**: `stb_image_write.h`가 들어 있는 디렉터리
-- **C/C++ → 전처리기 → 전처리기 정의**: `_CRT_SECURE_NO_WARNINGS` 추가. 현재 MSVC 설정에서 stb 내부의 `sprintf` 사용으로 발생하는 C4996을 해제하는 데 필요합니다.
-
-`Image.cpp`가 stb의 구현 매크로를 정의하므로 별도의 stb 라이브러리를 링크할 필요는 없습니다.
-
-### 빌드
-
-1. 저장소를 내려받고 `RayTracingInOneWeekend.sln`을 엽니다.
-2. 위의 외부 헤더 경로와 전처리기 정의를 설정합니다.
-3. `Release | x64`를 선택하고 솔루션을 빌드합니다. 설정된 `v145` 도구 집합이 설치되어 있어야 합니다.
-4. 빌드된 `Bin/x64/Release/RayTracingInOneWeekend.exe`를 실행합니다.
-
-Visual Studio 개발자 PowerShell에서는 프로젝트에 위 설정을 저장한 뒤 다음 명령으로도 빌드할 수 있습니다.
-
-```powershell
-msbuild .\RayTracingInOneWeekend.sln /p:Configuration=Release /p:Platform=x64
-```
-
-Visual Studio 2026(`v145`)의 `Release | x64`에서 위 헤더와 전처리기 정의를 적용해 빌드를 확인했습니다.
-
-### 출력과 설정
-
-PNG는 **프로세스의 작업 디렉터리를 기준으로 한 `Outputs` 폴더**에 저장됩니다. 예를 들어 저장소 루트에서 아래 명령을 실행하면 루트의 `Outputs`에 결과가 생깁니다. 파일 이름에는 장면 이름과 생성 시각이 붙고, 콘솔에는 진행률과 저장 결과가 출력됩니다.
-
-```powershell
-.\Bin\x64\Release\RayTracingInOneWeekend.exe
-```
-
-장면과 렌더 설정은 `Main.cpp`에서 변경합니다. `kHeight`와 종횡비로 해상도를 정하고, `SetSample()`과 `SetMaxDepth()`로 픽셀당 샘플 수와 추적 깊이를 설정합니다. 카메라 구도는 `SetCenter()`·`SetLookAt()`·`SetFOV()`, 초점은 `SetFocusDistance()`·`SetDefocusRad()`로 지정합니다. 각도 설정은 `ToRad()`로 라디안으로 변환해 전달합니다.
-
-## 구현 범위와 참고
-
-이 프로젝트는 정적인 구 장면을 CPU에서 계산해 PNG로 출력하는 오프라인 렌더러입니다. 광선마다 물체 목록을 순회하며 가장 가까운 교차를 찾고, 확산·금속·유리의 산란 규칙을 따라 색을 계산합니다. 단순한 배경에서 시작해 물체의 형태, 재질, 카메라와 초점이 하나의 이미지로 이어지는 과정까지 구현했습니다.
-
-학습 원전은 [Ray Tracing in One Weekend](https://raytracing.github.io/books/RayTracingInOneWeekend.html)입니다. 이 README는 저장소의 구현과 결과를 연결해 설명하며, 교차 방정식이나 카메라 좌표계의 상세 유도는 원문에서 확인할 수 있습니다.
-
-<details>
-<summary>단계별 이미지 출처</summary>
-
-현재 브랜치에서 빠져 있던 중간 렌더 이미지를 아래 커밋에서 복원했습니다. 원본 픽셀을 변경하지 않았으며, 파일 이름은 문서에서 참조하기 쉽게 정리했습니다.
-
-| 이미지 | 원본 커밋 |
-|---|---|
-| `background.png` | [`fdd9e5e`](https://github.com/JuggernautSensei/RayTracingInOneWeekend/commit/fdd9e5e) |
-| `sphere.png` | [`e5e6f3c`](https://github.com/JuggernautSensei/RayTracingInOneWeekend/commit/e5e6f3c) |
-| `normals.png` | [`865e3a2`](https://github.com/JuggernautSensei/RayTracingInOneWeekend/commit/865e3a2) |
-| `antialiasing.png` | [`1a10c98`](https://github.com/JuggernautSensei/RayTracingInOneWeekend/commit/1a10c98) |
-| `diffuse.png` | [`035a579`](https://github.com/JuggernautSensei/RayTracingInOneWeekend/commit/035a579) |
-| `metal.png` | [`59034a0`](https://github.com/JuggernautSensei/RayTracingInOneWeekend/commit/59034a0) |
-| `glass-camera.png` | [`cb9c0f8`](https://github.com/JuggernautSensei/RayTracingInOneWeekend/commit/cb9c0f8) |
-| `defocus.png` | [`1fbcfa0`](https://github.com/JuggernautSensei/RayTracingInOneWeekend/commit/1fbcfa0) |
-
-</details>
