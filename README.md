@@ -190,18 +190,3 @@ else
 ```
 
 카메라는 시야각 20°, 디포커스 각도 0.6°, 초점 거리 10으로 설정했습니다.
-
-<br>
-
-## 코드 구조
-
-| 파일 | 역할 |
-|---|---|
-| `Camera` | 뷰포트와 카메라 기저 계산, 픽셀별 광선 생성, 광선 추적과 렌더링 |
-| `IHittable`, `HittableList`, `Sphere` | 광선과 교차할 수 있는 오브젝트의 인터페이스, 오브젝트 목록, 구 |
-| `Material`, `Lambertian`, `Metal`, `Dielectric` | 재질 인터페이스와 확산·금속·유리 재질의 산란 계산 |
-| `Vector`, `Ray`, `Interval` | 벡터 연산(반사·굴절 포함), 광선, 유효한 `t` 범위 |
-| `Random`, `RandomUtils`, `VectorUtils` | 난수 생성기, 단위 구·원판 위의 무작위 벡터, 감마 보정 |
-| `Image` | RGB 이미지 버퍼와 PNG 저장 |
-| `Profile`, `Timer`, `Assertion` | 함수 단위 시간 측정, 타이머, 어서션 |
-| `Main` | 최종 씬 구성과 카메라 설정 |
