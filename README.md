@@ -1,6 +1,10 @@
+<div align="center">
+    
 # Ray Tracing in One Weekend
 
 <p align="center"><img src="RayTracingInOneWeekend/Outputs/14.%20Final%20Scene%202026-06-27%20195327.png" alt="여러 색의 작은 구와 확산·금속·유리 재질의 큰 구가 놓인 최종 렌더링 결과" width="960"></p>
+
+</div>
 
 *반사와 굴절, 확산 반사, 초점에 따른 흐림을 함께 적용한 최종 씬입니다.*
 
