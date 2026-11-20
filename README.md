@@ -1,10 +1,13 @@
-<div align="center">
+<h1 align="center">Ray Tracing in One Weekend</h1>
 
-# Ray Tracing in One Weekend
+<p align="center">C++로 만든 소프트웨어 레이 트레이서</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/C++-00599C?logo=cplusplus&logoColor=white" alt="C++">
+  <img src="https://img.shields.io/badge/Platform-Windows-0078D4" alt="Windows">
+</p>
 
 <p align="center"><img src="RayTracingInOneWeekend/Outputs/14.%20Final%20Scene%202026-06-27%20195327.png" alt="확산·금속·유리 재질의 구와 디포커스 블러를 함께 적용한 최종 렌더링 결과" width="960"></p>
-
-</div>
 
 [Ray Tracing in One Weekend](https://raytracing.github.io/books/RayTracingInOneWeekend.html)의 내용을 바탕으로 구현한 C++ 소프트웨어 레이 트레이서입니다. 카메라에서 픽셀을 향해 광선을 보내고, 물체와의 교차와 재질에 따른 반사·굴절을 계산해 한 장의 이미지를 만듭니다. 렌더링은 CPU에서 수행하며 결과는 PNG로 저장합니다.
 
@@ -19,8 +22,7 @@
 - [금속과 유리](#금속과-유리)
 - [카메라와 초점](#카메라와-초점)
 - [최종 씬](#최종-씬)
-
-<br>
+- [빌드 및 실행](#빌드-및-실행)
 
 ## 광선과 배경
 
@@ -31,8 +33,6 @@
 <p align="center"><img src="docs/images/background.png" alt="위쪽의 하늘색에서 아래쪽의 흰색으로 이어지는 초기 배경" width="640"></p>
 
 <p align="center"><em>광선의 세로 방향을 두 색 사이의 보간값으로 사용한 배경입니다.</em></p>
-
-<br>
 
 ## 구와 표면 법선
 
@@ -69,8 +69,6 @@ if (pHittable->Hit(_ray, _interval, _outRecord))
 
 모든 물체를 검사한 뒤에는 가장 작은 `t`를 가진 교차가 남습니다. 구를 목록에 넣는 순서와 관계없이 앞의 구가 뒤의 구를 가리게 되고, 교차한 표면의 위치·법선·재질을 다음 색 계산에 사용할 수 있습니다.
 
-<br>
-
 ## 샘플링
 
 픽셀마다 중앙을 향하는 광선을 하나씩 보내면 구의 경계가 계단처럼 보입니다. 경계에 걸친 픽셀도 구와 배경 중 한쪽 색만 갖기 때문입니다. 픽셀 안의 여러 위치를 살펴보고 그 색을 섞으면, 한 픽셀이 덮는 영역에 물체가 얼마나 포함되어 있는지를 표현할 수 있습니다.
@@ -87,8 +85,6 @@ const float yOffset = m_sample == 1 ? 0.5f : GenerateRandomSHR3<float>(0.f, 1.f)
 <p align="center"><em>구와 배경 사이의 픽셀에 두 색이 함께 반영되면서 외곽선이 부드러워집니다.</em></p>
 
 같은 평균 계산은 재질과 초점 표현에도 이어집니다. 확산 반사에서는 광선이 퍼지는 방향을, 디포커스 블러에서는 렌즈 위의 시작점을 무작위로 선택합니다. 샘플 수를 늘리면 이러한 무작위 선택에 따른 잡음이 줄어들지만, 픽셀마다 추적해야 하는 광선 수와 계산량도 함께 늘어납니다.
-
-<br>
 
 ## 확산 반사
 
@@ -128,8 +124,6 @@ m_imageBuffer.WriteLinear(x, y, GammaCorrect(color, 2.f));
 ```
 
 감마 2 보정은 각 색 성분의 제곱근을 구하는 것과 같습니다. 평균낸 선형 색을 그대로 저장하면 중간 밝기가 어둡게 보이기 때문에, 표시할 색으로 변환한 뒤 RGB 바이트로 옮겼습니다.
-
-<br>
 
 ## 금속과 유리
 
@@ -180,8 +174,6 @@ else
 
 <p align="center"><em>왼쪽 유리 구 너머로 바닥과 뒤쪽 장면이 굴절되어 보입니다. 가운데 확산 구, 오른쪽 금속 구와 표면의 차이를 비교할 수 있습니다.</em></p>
 
-<br>
-
 ## 카메라와 초점
 
 ### 위치와 시야각
@@ -207,8 +199,6 @@ return m_center + m_defocusDiskRight * sample.x + m_defocusDiskUp * sample.y;
 
 렌즈 반지름은 디포커스 각도와 초점 거리로 정했습니다. 같은 초점 거리에서 디포커스 각도가 커지면 광선의 시작점이 더 넓게 퍼져 흐림이 커집니다. 각도가 0일 때는 카메라 중심에서 광선을 출발시킵니다.
 
-<br>
-
 ## 최종 씬
 
 <p align="center"><img src="RayTracingInOneWeekend/Outputs/14.%20Final%20Scene%202026-06-27%20195327.png" alt="확산·금속·유리 재질의 구와 디포커스 블러를 함께 적용한 최종 씬" width="960"></p>
@@ -219,15 +209,62 @@ return m_center + m_defocusDiskRight * sample.x + m_defocusDiskUp * sample.y;
 
 렌더 설정은 다음과 같습니다.
 
-| 항목 | 설정 |
-|---|---|
-| 이미지 크기 | 1920×1080 |
-| 픽셀당 샘플 수 | 500 |
-| 재귀 깊이 설정값 | 50 |
-| 수직 시야각 | 20° |
-| 카메라 위치 | `(13, 2, -3)` |
-| 바라보는 지점 | `(0, 0, 0)` |
-| 디포커스 각도 | 0.6° |
-| 초점 거리 | 10 |
+<table width="100%">
+  <thead>
+    <tr>
+      <th align="left">항목</th>
+      <th align="left">설정</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td align="left">이미지 크기</td>
+      <td align="left">1920×1080</td>
+    </tr>
+    <tr>
+      <td align="left">픽셀당 샘플 수</td>
+      <td align="left">500</td>
+    </tr>
+    <tr>
+      <td align="left">재귀 깊이 설정값</td>
+      <td align="left">50</td>
+    </tr>
+    <tr>
+      <td align="left">수직 시야각</td>
+      <td align="left">20°</td>
+    </tr>
+    <tr>
+      <td align="left">카메라 위치</td>
+      <td align="left"><code>(13, 2, -3)</code></td>
+    </tr>
+    <tr>
+      <td align="left">바라보는 지점</td>
+      <td align="left"><code>(0, 0, 0)</code></td>
+    </tr>
+    <tr>
+      <td align="left">디포커스 각도</td>
+      <td align="left">0.6°</td>
+    </tr>
+    <tr>
+      <td align="left">초점 거리</td>
+      <td align="left">10</td>
+    </tr>
+  </tbody>
+</table>
 
 카메라를 낮은 시점에 놓고 원점 쪽을 바라보게 해 가까운 구와 멀리 있는 구가 함께 보이도록 했습니다. 광선과 구의 교차에서 시작한 계산에 재질의 산란과 여러 번의 샘플링, 렌즈의 초점 표현을 더해 최종 장면을 렌더링했습니다.
+
+## 빌드 및 실행
+
+Windows에서 Visual Studio 2026(플랫폼 도구 집합 `v145`)로 빌드합니다. PNG 저장에는 `stb_image_write.h`를 사용하며, 이 헤더는 저장소에 포함되어 있지 않아 별도로 설치해야 합니다.
+
+1. 저장소를 받습니다.
+
+   ```powershell
+   git clone https://github.com/JuggernautSensei/RayTracingInOneWeekend.git
+   ```
+
+2. `RayTracingInOneWeekend.sln`을 Visual Studio로 열고 구성을 `Release | x64`로 둡니다.
+3. 빌드한 뒤 실행합니다.
+
+렌더링이 끝나면 `Outputs` 폴더에 장면 이름과 시각이 붙은 PNG가 저장됩니다. 이미지 크기와 샘플 수, 카메라 설정은 `Main.cpp`에서 바꿉니다. 기본 설정이 1920×1080, 픽셀당 500샘플이라 렌더링에는 시간이 걸립니다.
