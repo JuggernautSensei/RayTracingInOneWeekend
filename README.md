@@ -9,12 +9,9 @@
 
 <p align="center"><img src="RayTracingInOneWeekend/Outputs/14.%20Final%20Scene%202026-06-27%20195327.png" alt="확산·금속·유리 재질의 구와 디포커스 블러를 함께 적용한 최종 렌더링 결과" width="960"></p>
 
-[Ray Tracing in One Weekend](https://raytracing.github.io/books/RayTracingInOneWeekend.html)의 내용을 바탕으로 구현한 C++ 소프트웨어 레이 트레이서입니다. 카메라에서 픽셀을 향해 광선을 보내고, 물체와의 교차와 재질에 따른 반사·굴절을 계산해 한 장의 이미지를 만듭니다. 렌더링은 CPU에서 수행하며 결과는 PNG로 저장합니다.
-
-광선 방향으로 하늘을 그리는 것에서 시작해 구와의 교차, 표면 법선, 안티에일리어싱을 구현했습니다. 여기에 확산·금속·유리 재질을 더하고, 카메라의 위치와 시야각, 초점을 조절해 여러 재질의 구가 놓인 장면을 구성했습니다.
-
 ## Contents
 
+- [프로젝트 소개](#프로젝트-소개)
 - [광선과 배경](#광선과-배경)
 - [구와 표면 법선](#구와-표면-법선)
 - [샘플링](#샘플링)
@@ -24,15 +21,17 @@
 - [최종 씬](#최종-씬)
 - [빌드 및 실행](#빌드-및-실행)
 
+## 프로젝트 소개
+
+[Ray Tracing in One Weekend](https://raytracing.github.io/books/RayTracingInOneWeekend.html)를 따라 만든 C++ 소프트웨어 레이 트레이서입니다. 프로그램을 실행하면 확산 재질, 금속, 유리로 된 구가 놓인 장면을 CPU에서 계산해 PNG로 저장합니다. 같은 구도 표면에서 광선이 흩어지면 무광으로 보이고, 주변 풍경을 반사하거나 뒤쪽 물체에서 온 빛을 굴절시키면 금속이나 유리처럼 보입니다.
+
 ## 광선과 배경
 
 카메라 앞에 가상의 화면인 뷰포트를 놓고, 각 픽셀의 위치를 향하는 광선을 만들었습니다. 광선은 시작점과 방향으로 표현합니다. 시작점에 방향 벡터의 `t`배를 더하면 광선 위의 점을 구할 수 있고, 이 점이 물체의 표면에 놓이는지를 검사해 픽셀의 색을 정합니다. 방향 벡터는 단위 길이로 정규화해 사용했습니다.
 
+![위쪽의 하늘색에서 아래쪽의 흰색으로 이어지는 초기 배경](docs/images/background.png)
+
 처음에는 물체 없이 광선의 방향만으로 배경을 그렸습니다. 방향의 y 성분을 0~1 범위로 옮겨 흰색과 하늘색을 보간하면, 위쪽을 향할수록 푸르고 아래쪽을 향할수록 밝은 하늘이 됩니다. 물체를 추가한 뒤에도 어디에도 닿지 않은 광선은 이 배경색을 반환합니다.
-
-<p align="center"><img src="docs/images/background.png" alt="위쪽의 하늘색에서 아래쪽의 흰색으로 이어지는 초기 배경" width="640"></p>
-
-<p align="center"><em>광선의 세로 방향을 두 색 사이의 보간값으로 사용한 배경입니다.</em></p>
 
 ## 구와 표면 법선
 
@@ -50,8 +49,6 @@
   <img src="docs/images/sphere.png" alt="교차한 픽셀을 빨간색으로 표시한 구" width="49%">
   <img src="docs/images/normals.png" alt="구와 바닥의 표면 법선을 RGB 색으로 표현한 결과" width="49%">
 </p>
-
-<p align="center"><em>왼쪽은 교차 여부만 표시한 구이고, 오른쪽은 법선 방향을 색으로 나타낸 구와 바닥입니다.</em></p>
 
 표면에 도착한 광선이 구 바깥에서 들어온 것인지, 안쪽에서 나가는 것인지도 구분했습니다. 광선 방향과 바깥쪽 법선의 내적이 양수이면 안쪽에서 나온 경우입니다. 이때 법선을 뒤집어 입사 광선과 마주 보게 하고, `bFrontFace`에 앞뒷면 정보를 따로 남겼습니다. 이후 유리 재질에서 공기와 유리 사이의 굴절률 비율을 선택할 때 이 정보를 사용합니다.
 
@@ -80,9 +77,7 @@ const float xOffset = m_sample == 1 ? 0.5f : GenerateRandomSHR3<float>(0.f, 1.f)
 const float yOffset = m_sample == 1 ? 0.5f : GenerateRandomSHR3<float>(0.f, 1.f);
 ```
 
-<p align="center"><img src="docs/images/antialiasing.png" alt="픽셀 내부의 여러 위치를 샘플링해 구의 경계를 부드럽게 표현한 결과" width="840"></p>
-
-<p align="center"><em>구와 배경 사이의 픽셀에 두 색이 함께 반영되면서 외곽선이 부드러워집니다.</em></p>
+![픽셀 내부의 여러 위치를 샘플링해 구의 경계를 부드럽게 표현한 결과](docs/images/antialiasing.png)
 
 같은 평균 계산은 재질과 초점 표현에도 이어집니다. 확산 반사에서는 광선이 퍼지는 방향을, 디포커스 블러에서는 렌즈 위의 시작점을 무작위로 선택합니다. 샘플 수를 늘리면 이러한 무작위 선택에 따른 잡음이 줄어들지만, 픽셀마다 추적해야 하는 광선 수와 계산량도 함께 늘어납니다.
 
@@ -104,11 +99,9 @@ if (record.pMaterial->Scatter(_ray, record, attenuation, scattered))
 return Vec3::kZero;
 ```
 
+![확산 반사를 적용한 회색 구와 바닥, 구 아래쪽에 형성된 어두운 음영](docs/images/diffuse.png)
+
 색 계산은 산란한 광선에 대해 같은 함수를 다시 호출하는 재귀 구조입니다. 광선이 다른 물체에 닿으면 그 재질의 색이 다시 곱해지고, 배경에 도달하면 하늘색이 돌아옵니다. 경로를 따라 쌓인 표면의 감쇠가 처음 픽셀까지 전달되며, 여러 경로의 결과를 평균내 최종 색을 구합니다.
-
-<p align="center"><img src="docs/images/diffuse.png" alt="확산 반사를 적용한 회색 구와 바닥, 구 아래쪽에 형성된 어두운 음영" width="840"></p>
-
-<p align="center"><em>구와 바닥에 확산 재질을 적용한 결과입니다. 표면의 밝기가 달라지고, 구 아래쪽과 바닥이 만나는 부분에는 어두운 음영이 나타납니다.</em></p>
 
 물체와 바닥이 가까운 부분에서는 산란한 광선이 다른 표면에 다시 닿기 쉽습니다. 그만큼 감쇠를 여러 번 거친 경로가 생기므로, 배경으로 곧바로 향하는 부분과 밝기가 달라집니다. 위 이미지의 입자 형태 잡음은 무작위로 고른 경로들의 차이이며, 샘플을 더 모아 평균내면 줄어듭니다.
 
@@ -141,11 +134,9 @@ _attenuation = m_albedo;
 return reflected.Dot(_record.normal) > 0.f;
 ```
 
+![파란 확산 구와 주변 장면이 비치는 두 금속 구](docs/images/metal.png)
+
 무작위 성분을 더한 결과가 표면 안쪽을 향하면 해당 경로는 흡수한 것으로 처리했습니다. 표면 바깥으로 향하는 광선에 대해서는 금속의 `albedo`를 곱해 다음 색을 누적합니다.
-
-<p align="center"><img src="docs/images/metal.png" alt="파란 확산 구와 주변 장면이 비치는 두 금속 구" width="900"></p>
-
-<p align="center"><em>가운데는 확산 재질, 양옆은 금속 재질입니다. 금속 구의 표면에는 바닥과 다른 구의 모습이 비칩니다.</em></p>
 
 ### 반사와 굴절
 
@@ -153,26 +144,9 @@ return reflected.Dot(_record.normal) > 0.f;
 
 유리 안에서 밖으로 나가는 광선은 입사각에 따라 굴절이 불가능할 수 있습니다. 이 전반사 조건에서는 반사 방향을 선택합니다. 굴절할 수 있는 경우에는 Schlick 근사로 반사율을 구하고, 난수와 비교해 반사와 굴절 중 하나를 선택했습니다.
 
-```cpp
-const float eta = _record.bFrontFace ? (1.f / m_ior) : m_ior;
-const float cos = -_ray.dir.Dot(_record.normal);
-const float sin = ::sqrtf(1.f - cos * cos);
-
-if (eta * sin > 1.f || Reflectance(cos, eta) > GenerateRandomSHR3<float>(0.f, 1.f))
-{
-    dir = _ray.dir.Reflect(_record.normal).Normalize();
-}
-else
-{
-    dir = _ray.dir.Refract(_record.normal, eta).Normalize();
-}
-```
+![유리·확산·금속 재질의 구가 나란히 놓인 장면](docs/images/glass-camera.png)
 
 한 샘플에서는 한 경로만 추적하지만, 여러 샘플이 모이면 반사와 굴절이 반사율에 따라 함께 나타납니다. 표면을 비스듬히 볼수록 반사되는 비중이 커지고, 구 뒤쪽의 물체는 굴절된 경로를 따라 보입니다. 유리의 감쇠 색은 흰색으로 두었습니다.
-
-<p align="center"><img src="docs/images/glass-camera.png" alt="유리·확산·금속 재질의 구가 나란히 놓인 장면" width="900"></p>
-
-<p align="center"><em>왼쪽 유리 구 너머로 바닥과 뒤쪽 장면이 굴절되어 보입니다. 가운데 확산 구, 오른쪽 금속 구와 표면의 차이를 비교할 수 있습니다.</em></p>
 
 ## 카메라와 초점
 
@@ -191,17 +165,15 @@ const Vec3 sample = GenerateRandomVec3InDisk();
 return m_center + m_defocusDiskRight * sample.x + m_defocusDiskUp * sample.y;
 ```
 
+![파란 구와 뒤쪽 금속 구의 윤곽이 서로 다른 선명도로 나타나는 디포커스 블러](docs/images/defocus.png)
+
 이 광선들이 향하는 뷰포트는 초점 거리에 놓입니다. 초점면의 한 샘플 위치를 향하는 광선은 렌즈의 서로 다른 곳에서 출발해도 그 위치에서 만나지만, 초점면 앞뒤에서는 서로 다른 지점을 통과합니다. 픽셀 안의 위치와 렌즈 위의 시작점을 바꿔 가며 평균내면, 초점이 맞는 부분은 선명하게 남고 다른 거리의 물체는 흐려집니다.
-
-<p align="center"><img src="docs/images/defocus.png" alt="파란 구와 뒤쪽 금속 구의 윤곽이 서로 다른 선명도로 나타나는 디포커스 블러" width="900"></p>
-
-<p align="center"><em>초점에서 벗어난 물체의 윤곽이 흐려지는 디포커스 블러입니다.</em></p>
 
 렌즈 반지름은 디포커스 각도와 초점 거리로 정했습니다. 같은 초점 거리에서 디포커스 각도가 커지면 광선의 시작점이 더 넓게 퍼져 흐림이 커집니다. 각도가 0일 때는 카메라 중심에서 광선을 출발시킵니다.
 
 ## 최종 씬
 
-<p align="center"><img src="RayTracingInOneWeekend/Outputs/14.%20Final%20Scene%202026-06-27%20195327.png" alt="확산·금속·유리 재질의 구와 디포커스 블러를 함께 적용한 최종 씬" width="960"></p>
+![확산·금속·유리 재질의 구와 디포커스 블러를 함께 적용한 최종 씬](RayTracingInOneWeekend/Outputs/14.%20Final%20Scene%202026-06-27%20195327.png)
 
 큰 바닥 구 위에 반지름 0.2인 작은 구를 배치하고, 확산·금속·유리 재질을 섞어 최종 장면을 구성했습니다. 22×22 격자 안에서 위치를 조금씩 무작위로 옮기고, 큰 구 주변의 일부 위치는 비워 두었습니다. 작은 구의 재질 선택 확률은 확산 80%, 금속 15%, 유리 5%로 두었습니다.
 
@@ -265,6 +237,7 @@ Windows에서 Visual Studio 2026(플랫폼 도구 집합 `v145`)로 빌드합니
    ```
 
 2. `RayTracingInOneWeekend.sln`을 Visual Studio로 열고 구성을 `Release | x64`로 둡니다.
-3. 빌드한 뒤 실행합니다.
+3. [stb_image_write.h](https://github.com/nothings/stb/blob/master/stb_image_write.h)를 받고, 헤더가 있는 폴더를 프로젝트 속성의 C/C++ → 일반 → 추가 포함 디렉터리에 등록합니다.
+4. 빌드한 뒤 실행합니다.
 
 렌더링이 끝나면 `Outputs` 폴더에 장면 이름과 시각이 붙은 PNG가 저장됩니다. 이미지 크기와 샘플 수, 카메라 설정은 `Main.cpp`에서 바꿉니다. 기본 설정이 1920×1080, 픽셀당 500샘플이라 렌더링에는 시간이 걸립니다.
