@@ -8,7 +8,7 @@
   <img src="https://img.shields.io/badge/Platform-Windows-0078D4" alt="Windows">
 </p>
 
-![확산·금속·유리 재질의 구와 디포커스 블러를 적용한 최종 장면](RayTracingInOneWeekend/Outputs/14.%20Final%20Scene%202026-06-27%20195327.png)
+<p align="center"><img src="RayTracingInOneWeekend/Outputs/14.%20Final%20Scene%202026-06-27%20195327.png" alt="확산·금속·유리 재질의 구와 디포커스 블러를 적용한 최종 장면"></p>
 
 ## Contents
 
